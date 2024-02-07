@@ -56,6 +56,8 @@ int main(int argc, char **argv) {
                     running = false;
                     break;
                 case ALLEGRO_EVENT_KEY_DOWN: case ALLEGRO_EVENT_KEY_UP:
+                case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN: case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+                case ALLEGRO_EVENT_MOUSE_AXES: case ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY:
                     inputManager.addEvent(event);
                     break;
                 default:
@@ -66,6 +68,7 @@ int main(int argc, char **argv) {
     }
 
     // Clean up
+    al_destroy_display(display);
     al_destroy_event_queue(event_queue);
 
     return 0;
