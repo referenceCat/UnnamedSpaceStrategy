@@ -1,0 +1,14 @@
+//
+// Created by referencecat on 07.02.24.
+//
+
+#ifndef UNNAMEDSPACESTRATEGY_GUIENGINE_H
+#define UNNAMEDSPACESTRATEGY_GUIENGINE_H
+
+
+class GUIEngine {
+
+};
+
+
+#endif //UNNAMEDSPACESTRATEGY_GUIENGINE_H

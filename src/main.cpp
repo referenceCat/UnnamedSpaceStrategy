@@ -1,8 +1,9 @@
 #include <cstdio>
 #include <allegro5/allegro.h>
-#include "InputManager.h"
+#include "GameEngine.h"
 
 int main(int argc, char **argv) {
+    int UPS = 50, FPS = 50;
     bool running = true;
 
     // Initialize allegro
@@ -18,24 +19,30 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Failed to create event queue.");
         return 1;
     }
-
-    ALLEGRO_DISPLAY *display = nullptr;
-    display = al_create_display(500, 500);
     al_install_keyboard();
     al_install_mouse();
-    al_register_event_source(event_queue, al_get_display_event_source(display));
-
-    // Create the keyboard and mouse
-    al_install_keyboard();
-    al_install_mouse();
-
-    // Register event sources
     al_register_event_source(event_queue, al_get_keyboard_event_source());
     al_register_event_source(event_queue , al_get_mouse_event_source());
 
-    InputManager inputManager;
-    inputManager.setKeyCode(ALLEGRO_KEY_W, 1);
-    inputManager.setKeyCode(ALLEGRO_KEY_S, 2);
+
+    ALLEGRO_DISPLAY *display = nullptr;
+    display = al_create_display(500, 500);
+    al_register_event_source(event_queue, al_get_display_event_source(display));
+
+
+    GameEngine gameEngine;
+    gameEngine.init();
+    InputManager* inputManager = gameEngine.getInputManager();
+    GraphicsEngine* graphicsEngine = gameEngine.getGraphicsEngine();
+
+    // Initialize the timers
+    ALLEGRO_TIMER *redraw_timer = al_create_timer(1.0 / FPS);
+    ALLEGRO_TIMER *update_timer = al_create_timer(1.0 / UPS);
+    al_register_event_source(event_queue, al_get_timer_event_source(redraw_timer));
+    al_register_event_source(event_queue, al_get_timer_event_source(update_timer));
+    al_start_timer(redraw_timer);
+    al_start_timer(update_timer);
+
     // GameEngine loop
     while (running) {
         ALLEGRO_EVENT event;
@@ -53,10 +60,15 @@ int main(int argc, char **argv) {
                 case ALLEGRO_EVENT_DISPLAY_CLOSE:
                     running = false;
                     break;
+                case ALLEGRO_EVENT_TIMER:
+                    if (event.timer.source == update_timer) {
+                        gameEngine.update();
+                    }
+                    break;
                 case ALLEGRO_EVENT_KEY_DOWN: case ALLEGRO_EVENT_KEY_UP:
                 case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN: case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
                 case ALLEGRO_EVENT_MOUSE_AXES: case ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY:
-                    inputManager.addEvent(event);
+                    inputManager->addEvent(event);
                     break;
                 default:
                     fprintf(stderr, "Unsupported event received: %d\n", event.type);
