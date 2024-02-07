@@ -1,0 +1,14 @@
+//
+// Created by referencecat on 07.02.24.
+//
+
+#ifndef UNNAMEDSPACESTRATEGY_INPUTMANAGER_H
+#define UNNAMEDSPACESTRATEGY_INPUTMANAGER_H
+
+
+class InputManager {
+
+};
+
+
+#endif //UNNAMEDSPACESTRATEGY_INPUTMANAGER_H

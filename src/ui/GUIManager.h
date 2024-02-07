@@ -1,0 +1,14 @@
+//
+// Created by referencecat on 07.02.24.
+//
+
+#ifndef UNNAMEDSPACESTRATEGY_GUIMANAGER_H
+#define UNNAMEDSPACESTRATEGY_GUIMANAGER_H
+
+
+class GUIManager {
+
+};
+
+
+#endif //UNNAMEDSPACESTRATEGY_GUIMANAGER_H
