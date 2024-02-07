@@ -7,7 +7,7 @@
 
 class Constants {
 public :
-    int FPS_MAX = 50;
-    int UPS_MAX = 50;
+    static int FPS_MAX = 50;
+    static int UPS_MAX = 50;
 };
 #endif //UNNAMEDSPACESTRATEGY_CONSTANTS_H

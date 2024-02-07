@@ -12,13 +12,13 @@ void InputManager::addEvent(ALLEGRO_EVENT& allegroEvent) {
     if (allegroEvent.type == ALLEGRO_EVENT_KEY_DOWN) {
         if (key_table[allegroEvent.keyboard.keycode] == 0) return;
         inputEvent.type = InputEventType::key_down;
-        inputEvent.keyEvent.key_id = key_table[allegroEvent.keyboard.keycode];
+        inputEvent.keyboardEvent.key_id = key_table[allegroEvent.keyboard.keycode];
         event_queue.push(inputEvent);
         pressed_keys[key_table[allegroEvent.keyboard.keycode]] = true;
     } else if (allegroEvent.type == ALLEGRO_EVENT_KEY_UP) {
         if (key_table[allegroEvent.keyboard.keycode] == 0) return;
         inputEvent.type = InputEventType::key_up;
-        inputEvent.keyEvent.key_id = key_table[allegroEvent.keyboard.keycode];
+        inputEvent.keyboardEvent.key_id = key_table[allegroEvent.keyboard.keycode];
         event_queue.push(inputEvent);
         pressed_keys[key_table[allegroEvent.keyboard.keycode]] = false;
     } else if (allegroEvent.type == ALLEGRO_EVENT_MOUSE_AXES || allegroEvent.type == ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) {

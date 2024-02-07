@@ -33,7 +33,7 @@ struct InputEvent {
     uint64_t time; // in ms since 1970
     InputEventType type;
     union {
-        KeyboardEvent keyEvent;
+        KeyboardEvent keyboardEvent;
         MouseButtonEvent mouseButtonEvent;
         MouseMoveEvent mouseMoveEvent;
     };
