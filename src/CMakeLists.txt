@@ -1,9 +1,9 @@
 include_directories(test PUBLIC game_engine)
-include_directories(test PUBLIC orbital_mechanics)
-include_directories(test PUBLIC ui)
+include_directories(test PUBLIC game_engine/orbital_mechanics)
+include_directories(test PUBLIC game_engine/ui)
 add_executable(test main.cpp
-        ui/InputManager.h
-        ui/InputManager.cpp)
+        game_engine/ui/InputManager.h
+        game_engine/ui/InputManager.cpp)
 find_package(PkgConfig REQUIRED)
 
 include_directories(${PROJECT_SOURCE_DIR})
