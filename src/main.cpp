@@ -21,8 +21,8 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    ALLEGRO_DISPLAY *display = NULL;
-    display = al_create_display(100, 100);
+    ALLEGRO_DISPLAY *display = nullptr;
+    display = al_create_display(500, 500);
     al_install_keyboard();
     al_install_mouse();
     al_register_event_source(event_queue, al_get_display_event_source(display));
@@ -63,7 +63,6 @@ int main(int argc, char **argv) {
                     break;
             }
         }
-        if (!inputManager.isEmpty()) printf("%d\n", inputManager.getFirst()->keyEvent.key_type);
     }
 
     // Clean up
