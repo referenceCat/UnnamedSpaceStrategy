@@ -3,8 +3,6 @@
 #include "InputManager.h"
 
 int main(int argc, char **argv) {
-    int UPS = 50, FPS = 50;
-
     bool running = true;
 
     // Initialize allegro
@@ -44,7 +42,7 @@ int main(int argc, char **argv) {
         ALLEGRO_TIMEOUT timeout;
 
         // Initialize timeout
-        al_init_timeout(&timeout, 1);
+        al_init_timeout(&timeout, 0.06);
 
         // Fetch the event (if one exists)
         bool get_event = al_wait_for_event_until(event_queue, &event, &timeout);
