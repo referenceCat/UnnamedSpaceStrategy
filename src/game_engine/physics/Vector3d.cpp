@@ -31,3 +31,7 @@ Vector3d Vector3d::operator*(double other) const {
 Vector3d Vector3d::operator-() const {
     return *this * -1;
 }
+
+Vector3d Vector3d::rotateAroundZ(double angle) const {
+    return {x * cos(angle) - y * sin(angle), x * sin(angle + y * cos(angle)), z};
+}
