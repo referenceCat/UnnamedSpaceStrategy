@@ -9,6 +9,7 @@ add_executable(test main.cpp
         game_engine/physics/PhysicsEngine.h
         game_engine/physics/Vector3d.h
         game_engine/physics/Vector3d.cpp
+        game_engine/physics/PhysicsEngine.cpp
 )
 find_package(PkgConfig REQUIRED)
 
