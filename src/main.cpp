@@ -1,5 +1,8 @@
 #include <cstdio>
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include "GameEngine.h"
 
 int main(int argc, char **argv) {
@@ -26,8 +29,12 @@ int main(int argc, char **argv) {
 
 
     ALLEGRO_DISPLAY *display = nullptr;
-    display = al_create_display(500, 500);
+    display = al_create_display(1000, 1000);
     al_register_event_source(event_queue, al_get_display_event_source(display));
+    al_init_image_addon();
+    al_init_primitives_addon();
+    al_init_font_addon();
+    al_init_ttf_addon();
 
 
     GameEngine gameEngine;
@@ -42,6 +49,31 @@ int main(int argc, char **argv) {
     al_register_event_source(event_queue, al_get_timer_event_source(update_timer));
     al_start_timer(redraw_timer);
     al_start_timer(update_timer);
+
+
+
+    graphicsEngine->setDisplay(display);
+    // graphicsEngine->setDisplaySize(1000, 1000);
+
+    al_set_target_bitmap(al_get_backbuffer(al_get_current_display()));
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_hold_bitmap_drawing(true);
+
+    graphicsEngine->setCameraPosition(0, 0);
+    graphicsEngine->setFOV(600E9);
+    Vector3d zero = Vector3d();
+    graphicsEngine->drawCelestialBody(7E9, zero);
+    graphicsEngine->drawDebugText("12345", 1);
+    graphicsEngine->drawDebugText("123", 2);
+    OrbitalParameters orbitalParameters;
+    orbitalParameters.eccentricity = 0.3;
+    orbitalParameters.semimajor_axis = 150E9;
+    orbitalParameters.type = OrbitType::ecliptic;
+    graphicsEngine->drawOrbitPath(orbitalParameters, zero, false);
+    al_hold_bitmap_drawing(false);
+
+    al_draw_line(0, 0, 100, 100, al_map_rgb(255, 255, 255), 2);
+    al_flip_display();
 
     // GameEngine loop
     while (running) {
