@@ -8,41 +8,13 @@
 #include <cmath>
 #include <cassert>
 #include <cfloat>
-#include "Vector3d.h"
+#include "src/utils/Vector3d.h"
 #define MAX_CELESTIAL_BODIES 100
 #define MIN_CELESTIAL_BODY_MASS 1000000
 #define MIN_CELESTIAL_BODY_RADIUS 100
 #define ECCENTRIC_ANOMALY_ITERATIONS 100
 #define HYPERBOLIC_ECCENTRIC_ANOMALY_ITERATIONS 1000
-
-
-class PhysicsEngine;
-
-struct OrbitalParametersEcliptic {
-    double average_angular_velocity, period;
-};
-
-struct OrbitalParametersHyperbolic {
-    double hyperbolic_excess_speed, impact_parameter;
-};
-
-enum class OrbitType {
-    ecliptic, parabolic, hyperbolic
-};
-struct OrbitalParameters {
-    OrbitType type;
-    double eccentricity, // e >= 0
-    semimajor_axis, // in meters
-    argument_of_periapsis = 0, // from OX axis
-    med_anomaly_epoch_0 = 0,
-    parent_mass;
-    union {
-        OrbitalParametersEcliptic ecliptic;
-        OrbitalParametersHyperbolic hyperbolic;
-    };
-};
-
-
+#include "../utils/OrbitParameters.h"
 
 struct CelestialBody {
     int parent_id;
