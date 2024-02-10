@@ -16,6 +16,8 @@
 #define HYPERBOLIC_ECCENTRIC_ANOMALY_ITERATIONS 1000
 
 
+class PhysicsEngine;
+
 struct OrbitalParametersEcliptic {
     double average_angular_velocity, period;
 };
@@ -46,6 +48,7 @@ struct CelestialBody {
     int parent_id;
     OrbitalParameters orbitParameters;
     double mass, radius, soi_radius;
+    Vector3d position;
 
 };
 
@@ -74,13 +77,7 @@ public:
     double getSOI(int id);
     OrbitalParameters getOrbitalParametersOfCelestialBody(int id);
     Vector3d celestialBodyPosition(int id, uint64_t time);
-
-
-
-
-
-
-
+    Vector3d celestialBodyPosition(int id);
 };
 
 
