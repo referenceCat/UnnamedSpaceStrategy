@@ -23,6 +23,8 @@ int PhysicsEngine::addCelestialBody(int parent_id, OrbitalParameters &orbitalPar
     celestialBodies[celestialBodiesN].soi_radius = orbitalParameters.semimajor_axis * pow(mass / findCelestialBody(parent_id)->mass, 0.4);
     celestialBodies[celestialBodiesN].orbitParameters = orbitalParameters;
     celestialBodies[celestialBodiesN].orbitParameters.parent_mass = findCelestialBody(parent_id)->mass;
+    celestialBodies[celestialBodiesN].orbitParameters.ecliptic.average_angular_velocity = averageAngularVelocity(orbitalParameters);
+    celestialBodies[celestialBodiesN].orbitParameters.ecliptic.period = period(orbitalParameters);
     return celestialBodiesN++;
 }
 
@@ -50,6 +52,10 @@ int PhysicsEngine::setupStar(double mass, double radius) {
 }
 
 void PhysicsEngine::tick(uint64_t delta_time) {
+    cur_time += delta_time;
+    for (int i = 1; i < celestialBodiesN; i++) {
+        celestialBodies[i].position = celestialBodyPosition(i, cur_time);
+    }
 
 }
 
@@ -115,5 +121,9 @@ Vector3d PhysicsEngine::celestialBodyPosition(int id, uint64_t time) {
     if (id == 0) return {0, 0};
     CelestialBody* body = findCelestialBody(id);
     return relativePosition(body->orbitParameters, time) + celestialBodyPosition(body->parent_id, time);
+}
+
+Vector3d PhysicsEngine::celestialBodyPosition(int id) {
+    return findCelestialBody(id)->position;
 }
 
