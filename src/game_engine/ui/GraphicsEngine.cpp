@@ -5,6 +5,7 @@
 #include "GraphicsEngine.h"
 #define CELESTIAL_MARKER_SIZE 10
 #define HYPERBOLA_MAX_RADIUS_ON_SCREEN 10000
+#define CAMERA_ZOOM_COEF 5
 
 void GraphicsEngine::setDisplay(ALLEGRO_DISPLAY *display) {
     this->display = display;
@@ -70,3 +71,55 @@ void GraphicsEngine::setDisplaySize(int width, int height) {
     al_resize_display(display, width, height);
 
 }
+
+void GraphicsEngine::initFrame() {
+    al_set_target_bitmap(al_get_backbuffer(al_get_current_display()));
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    al_hold_bitmap_drawing(true);
+}
+
+void GraphicsEngine::endFrame() {
+    al_hold_bitmap_drawing(false);
+    al_flip_display();
+}
+
+void GraphicsEngine::drawSOI(double soi_radius, Vector3d &position) {
+    int x = (position.x - cameraX + FOV_width / 2) * al_get_display_width(display) / FOV_width;
+    int y = (- position.y + cameraY + FOV_height / 2) * al_get_display_width(display) / FOV_width;
+    int radius = (soi_radius) * al_get_display_width(display) / FOV_width;
+
+    al_draw_filled_circle(x, y, radius, al_map_rgba(255, 255, 255, 50));
+}
+
+void GraphicsEngine::moveCamera(int direction) {
+    double value = cameraMovementSpeed * FOV_width;
+    switch (direction) {
+        case 1:
+            cameraX += value;
+            break;
+        case 2:
+            cameraY += value;
+            break;
+        case 3:
+            cameraX -= value;
+            break;
+        case 4:
+            cameraY -= value;
+            break;
+        case 5:
+            FOV_width -= value * CAMERA_ZOOM_COEF;
+            FOV_height = FOV_width * getDisplayParameters().height / getDisplayParameters().width;
+            break;
+        case 6:
+            FOV_width += value * CAMERA_ZOOM_COEF;
+            FOV_height = FOV_width * getDisplayParameters().height / getDisplayParameters().width;
+            break;
+    }
+}
+    double GraphicsEngine::getCameraMovementSpeed() const {
+        return cameraMovementSpeed;
+    }
+
+    void GraphicsEngine::setCameraMovementSpeed(double cameraMovementSpeed) {
+        GraphicsEngine::cameraMovementSpeed = cameraMovementSpeed;
+    }

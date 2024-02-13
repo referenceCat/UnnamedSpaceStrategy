@@ -39,6 +39,7 @@ int main(int argc, char **argv) {
 
     GameEngine gameEngine;
     gameEngine.init();
+    gameEngine.setUPS(UPS);
     InputManager* inputManager = gameEngine.getInputManager();
     GraphicsEngine* graphicsEngine = gameEngine.getGraphicsEngine();
 
@@ -55,25 +56,11 @@ int main(int argc, char **argv) {
     graphicsEngine->setDisplay(display);
     // graphicsEngine->setDisplaySize(1000, 1000);
 
-    al_set_target_bitmap(al_get_backbuffer(al_get_current_display()));
-    al_clear_to_color(al_map_rgb(0, 0, 0));
-    al_hold_bitmap_drawing(true);
+
 
     graphicsEngine->setCameraPosition(0, 0);
     graphicsEngine->setFOV(600E9);
-    Vector3d zero = Vector3d();
-    graphicsEngine->drawCelestialBody(7E9, zero);
-    graphicsEngine->drawDebugText("12345", 1);
-    graphicsEngine->drawDebugText("123", 2);
-    OrbitalParameters orbitalParameters;
-    orbitalParameters.eccentricity = 0.3;
-    orbitalParameters.semimajor_axis = 150E9;
-    orbitalParameters.type = OrbitType::ecliptic;
-    graphicsEngine->drawOrbitPath(orbitalParameters, zero, false);
-    al_hold_bitmap_drawing(false);
 
-    al_draw_line(0, 0, 100, 100, al_map_rgb(255, 255, 255), 2);
-    al_flip_display();
 
     // GameEngine loop
     while (running) {
@@ -95,6 +82,8 @@ int main(int argc, char **argv) {
                 case ALLEGRO_EVENT_TIMER:
                     if (event.timer.source == update_timer) {
                         gameEngine.update();
+                    } else if (event.timer.source == redraw_timer) {
+                        gameEngine.redraw();
                     }
                     break;
                 case ALLEGRO_EVENT_KEY_DOWN: case ALLEGRO_EVENT_KEY_UP:

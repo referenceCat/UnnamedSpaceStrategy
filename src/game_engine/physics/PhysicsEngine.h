@@ -32,8 +32,8 @@ class PhysicsEngine {
     CelestialBody * findCelestialBody(int id);
     double eccentricAnomaly(OrbitalParameters& orbitalParameters, uint64_t time) const;
     double medianAnomaly(OrbitalParameters& orbitalParameters, uint64_t time) const;
-    static double averageAngularVelocity(OrbitalParameters& orbitalParameters) ;
-    static double period(OrbitalParameters& orbitalParameters) ;
+    static double averageAngularVelocity(OrbitalParameters& orbitalParameters, double parent_body_mass);
+    static double period(OrbitalParameters& orbitalParameters);
     static double periapsis(OrbitalParameters& orbitalParameters) ;
     double apoapsis(OrbitalParameters& orbitalParameters) const;
     Vector3d relativePosition(OrbitalParameters& orbitalParameters, uint64_t time);
@@ -41,15 +41,18 @@ class PhysicsEngine {
 public:
     constexpr const static double G_const = 6.67430E-11;
     void init();
-    void tick(uint64_t delta_time);
+    void update(uint64_t delta_time);
     int setupStar(double mass, double radius);
     int addCelestialBody(int parent_id, OrbitalParameters& orbitalParameters, double mass, double radius);
-    double getMass(int id);
-    double getRadius(int id);
-    double getSOI(int id);
+    double getCelestialBodyMass(int id);
+    double getCelestialBodyRadius(int id);
+    double getCelestialBodySOI(int id);
     OrbitalParameters getOrbitalParametersOfCelestialBody(int id);
-    Vector3d celestialBodyPosition(int id, uint64_t time);
-    Vector3d celestialBodyPosition(int id);
+    Vector3d getRelativeCelestialBodyPositionAtTime(int id, uint64_t time);
+    Vector3d getCelestialBodyPosition(int id);
+    int getCelestialBodiesNumber();
+    int getParentId(int id);
+    uint64_t getTime();
 };
 
 
