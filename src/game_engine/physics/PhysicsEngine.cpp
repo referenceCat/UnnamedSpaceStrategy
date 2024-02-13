@@ -4,7 +4,7 @@
 #include "PhysicsEngine.h"
 
 CelestialBody * PhysicsEngine::findCelestialBody(int id) {
-    assert((id >= celestialBodiesN) && "there is no body with this id");
+    assert((id <= celestialBodiesN) && "there is no body with this id");
     return &celestialBodies[id];
 }
 
@@ -18,25 +18,25 @@ int PhysicsEngine::addCelestialBody(int parent_id, OrbitalParameters &orbitalPar
     assert((orbitalParameters.type == OrbitType::ecliptic) && "celestial body orbit must be ecliptic");
     // todo check how soi of both bodies collide
 
+    double parent_mass = findCelestialBody(parent_id)->mass;
     celestialBodies[celestialBodiesN].mass = mass;
     celestialBodies[celestialBodiesN].radius = radius;
-    celestialBodies[celestialBodiesN].soi_radius = orbitalParameters.semimajor_axis * pow(mass / findCelestialBody(parent_id)->mass, 0.4);
+    celestialBodies[celestialBodiesN].soi_radius = orbitalParameters.semimajor_axis * pow(mass / parent_mass, 0.4);
     celestialBodies[celestialBodiesN].orbitParameters = orbitalParameters;
-    celestialBodies[celestialBodiesN].orbitParameters.parent_mass = findCelestialBody(parent_id)->mass;
-    celestialBodies[celestialBodiesN].orbitParameters.ecliptic.average_angular_velocity = averageAngularVelocity(orbitalParameters);
-    celestialBodies[celestialBodiesN].orbitParameters.ecliptic.period = period(orbitalParameters);
+    celestialBodies[celestialBodiesN].orbitParameters.ecliptic.average_angular_velocity = averageAngularVelocity(celestialBodies[celestialBodiesN].orbitParameters, parent_mass);
+    celestialBodies[celestialBodiesN].orbitParameters.ecliptic.period = period(celestialBodies[celestialBodiesN].orbitParameters);
     return celestialBodiesN++;
 }
 
-double PhysicsEngine::getMass(int id) {
+double PhysicsEngine::getCelestialBodyMass(int id) {
     return findCelestialBody(id)->mass;
 }
 
-double PhysicsEngine::getRadius(int id) {
+double PhysicsEngine::getCelestialBodyRadius(int id) {
     return findCelestialBody(id)->radius;
 }
 
-double PhysicsEngine::getSOI(int id) {
+double PhysicsEngine::getCelestialBodySOI(int id) {
     return findCelestialBody(id)->soi_radius;
 }
 
@@ -51,10 +51,10 @@ int PhysicsEngine::setupStar(double mass, double radius) {
     return 0;
 }
 
-void PhysicsEngine::tick(uint64_t delta_time) {
+void PhysicsEngine::update(uint64_t delta_time) {
     cur_time += delta_time;
     for (int i = 1; i < celestialBodiesN; i++) {
-        celestialBodies[i].position = celestialBodyPosition(i, cur_time);
+        celestialBodies[i].position = getRelativeCelestialBodyPositionAtTime(i, cur_time) + getCelestialBodyPosition(celestialBodies[i].parent_id);
     }
 
 }
@@ -94,18 +94,18 @@ double PhysicsEngine::eccentricAnomaly(OrbitalParameters &orbitalParameters, uin
 }
 
 double PhysicsEngine::medianAnomaly(OrbitalParameters &orbitalParameters, uint64_t time) const {
-    if (orbitalParameters.type == OrbitType::ecliptic) return fmod((orbitalParameters.med_anomaly_epoch_0 + time * (long double) averageAngularVelocity(orbitalParameters) / 1000), (M_PI * 2)); //TODO sus to double conv
+    if (orbitalParameters.type == OrbitType::ecliptic) return fmod((orbitalParameters.med_anomaly_epoch_0 + time * (long double) orbitalParameters.ecliptic.average_angular_velocity / 1000), (M_PI * 2)); //TODO sus to double conv
     if (orbitalParameters.type == OrbitType::hyperbolic) return orbitalParameters.med_anomaly_epoch_0 + sqrt(- (((orbitalParameters.parent_mass / orbitalParameters.semimajor_axis) * G_const) / orbitalParameters.semimajor_axis) / orbitalParameters.semimajor_axis) * time / 1000;
 }
 
-double PhysicsEngine::averageAngularVelocity(OrbitalParameters &orbitalParameters) {
+double PhysicsEngine::averageAngularVelocity(OrbitalParameters &orbitalParameters, double parent_body_mass) {
     assert(orbitalParameters.type == OrbitType::ecliptic && "cannot get aav of non ecliptic orbit");
-    return sqrt(orbitalParameters.parent_mass * G_const / pow(orbitalParameters.semimajor_axis, 3));
+    return sqrt(parent_body_mass * G_const / pow(orbitalParameters.semimajor_axis, 3));
 }
 
 double PhysicsEngine::period(OrbitalParameters &orbitalParameters) {
     assert(orbitalParameters.type == OrbitType::ecliptic && "cannot get period of non ecliptic orbit");
-    return 2 * M_PI / averageAngularVelocity(orbitalParameters);
+    return 2 * M_PI / orbitalParameters.ecliptic.average_angular_velocity;
 }
 
 double PhysicsEngine::periapsis(OrbitalParameters &orbitalParameters) {
@@ -117,13 +117,26 @@ double PhysicsEngine::apoapsis(OrbitalParameters &orbitalParameters) const {
     return (1 + orbitalParameters.eccentricity) * orbitalParameters.semimajor_axis;
 }
 
-Vector3d PhysicsEngine::celestialBodyPosition(int id, uint64_t time) {
+Vector3d PhysicsEngine::getRelativeCelestialBodyPositionAtTime(int id, uint64_t time) {
     if (id == 0) return {0, 0};
     CelestialBody* body = findCelestialBody(id);
-    return relativePosition(body->orbitParameters, time) + celestialBodyPosition(body->parent_id, time);
+    return relativePosition(body->orbitParameters, time);
 }
 
-Vector3d PhysicsEngine::celestialBodyPosition(int id) {
+Vector3d PhysicsEngine::getCelestialBodyPosition(int id) {
     return findCelestialBody(id)->position;
+}
+
+int PhysicsEngine::getCelestialBodiesNumber() {
+    return celestialBodiesN;
+}
+
+int PhysicsEngine::getParentId(int id) {
+    assert(id != 0 && "star doesnt have parent celestial body");
+    return findCelestialBody(id)->parent_id;
+}
+
+uint64_t PhysicsEngine::getTime() {
+    return cur_time;
 }
 

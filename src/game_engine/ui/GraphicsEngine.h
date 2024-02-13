@@ -22,6 +22,7 @@ class GraphicsEngine {
     ALLEGRO_DISPLAY* display;
     double cameraX, cameraY, FOV_width = 600E9, FOV_height = 600E9;
     ALLEGRO_FONT* debug_font = al_load_ttf_font("/home/referencecat/CLionProjects/UntitledSpaceStrategy/resources/fonts/clacon2.ttf", 16, 0);
+    double cameraMovementSpeed = 0.2; // screens per second
 
 public:
     void setDisplay(ALLEGRO_DISPLAY* display);
@@ -33,7 +34,15 @@ public:
     void drawCelestialBody(double radius, Vector3d& position);
     void drawOrbitPath(OrbitalParameters& orbitalParameters, Vector3d& parent_position, int debug_lines);
     void drawDebugText(const char *string, int line);
+    void drawSOI(double radius, Vector3d& position);
+    void initFrame();
+    void endFrame();
 
+    double getCameraMovementSpeed() const;
+
+    void setCameraMovementSpeed(double cameraMovementSpeed);
+
+    void moveCamera(int direction);
 };
 
 
