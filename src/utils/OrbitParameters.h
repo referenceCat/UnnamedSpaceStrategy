@@ -23,6 +23,8 @@ struct OrbitalParameters {
     argument_of_periapsis = 0, // from OX axis
     med_anomaly_epoch_0 = 0,
             parent_mass;
+
+    bool directionCounterClockwise = true;
     union {
         OrbitalParametersEcliptic ecliptic;
         OrbitalParametersHyperbolic hyperbolic;

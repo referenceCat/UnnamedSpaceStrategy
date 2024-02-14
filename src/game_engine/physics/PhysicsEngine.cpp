@@ -69,7 +69,7 @@ Vector3d PhysicsEngine::relativePosition(OrbitalParameters &orbitalParameters, u
     eccentric_anomaly_value = eccentricAnomaly(orbitalParameters, time);
     if (orbitalParameters.type == OrbitType::ecliptic) {
         x = orbitalParameters.semimajor_axis * (cos(eccentric_anomaly_value) - orbitalParameters.eccentricity);
-        y = sqrt(1 - orbitalParameters.eccentricity * orbitalParameters.eccentricity) * orbitalParameters.semimajor_axis * sin(eccentric_anomaly_value);
+        y = sqrt(1 - orbitalParameters.eccentricity * orbitalParameters.eccentricity) * orbitalParameters.semimajor_axis * sin(eccentric_anomaly_value) * (orbitalParameters.directionCounterClockwise ? 1 : -1);
     } else if (orbitalParameters.type == OrbitType::hyperbolic) {
         x = cosh(eccentric_anomaly_value) * orbitalParameters.semimajor_axis - orbitalParameters.semimajor_axis  +
                 periapsis(orbitalParameters);

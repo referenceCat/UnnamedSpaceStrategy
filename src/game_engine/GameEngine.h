@@ -9,8 +9,9 @@
 #include "GraphicsEngine.h"
 #include "GUIEngine.h"
 #include "PhysicsEngine.h"
+#include <cmath>
 enum class Buttons {
-    BTN_UP, BTN_DOWN, BTN_LEFT, BTN_RIGHT, BTN_ZOOM_IN, BTN_ZOOM_OUT, BTN_TIME_WARP_UP, BTN_TIME_WARP_DOWN
+    BTN_UP = 1, BTN_DOWN, BTN_LEFT, BTN_RIGHT, BTN_ZOOM_IN, BTN_ZOOM_OUT, BTN_TIME_WARP_UP, BTN_TIME_WARP_DOWN
 };
 
 class GameEngine {

@@ -59,6 +59,16 @@ void GameEngine::init() {
     parameters.type = OrbitType::ecliptic;
     parameters.eccentricity = 0;
     parameters.semimajor_axis = 149.60E9;
+
+    physicsEngine.addCelestialBody(0, parameters, 5.9736E24, 6378E3);
+
+    parameters.type = OrbitType::ecliptic;
+    parameters.eccentricity = 0.2;
+    parameters.semimajor_axis = 200E9;
+    parameters.argument_of_periapsis = 2;
+    parameters.med_anomaly_epoch_0 = 2;
+    parameters.directionCounterClockwise = false;
+
     physicsEngine.addCelestialBody(0, parameters, 5.9736E24, 6378E3);
 }
 
@@ -70,10 +80,10 @@ void GameEngine::redraw() {
         position = physicsEngine.getCelestialBodyPosition(i);
         graphicsEngine.drawCelestialBody(physicsEngine.getCelestialBodyRadius(i), position);
         if (i != 0) {
+            graphicsEngine.drawSOI(physicsEngine.getCelestialBodySOI(i), position);
             parameters = physicsEngine.getOrbitalParametersOfCelestialBody(i);
             position = physicsEngine.getCelestialBodyPosition(physicsEngine.getParentId(i));
             graphicsEngine.drawOrbitPath(parameters, position, false);
-            graphicsEngine.drawCelestialBody(physicsEngine.getCelestialBodySOI(i), position);
         }
     }
     if (debug) {
