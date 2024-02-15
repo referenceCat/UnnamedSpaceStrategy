@@ -63,6 +63,11 @@ void GameEngine::init() {
     physicsEngine.addCelestialBody(0, parameters, 5.9736E24, 6378E3);
 
     parameters.type = OrbitType::ecliptic;
+    parameters.eccentricity = 0.0549;
+    parameters.semimajor_axis = 0.3844E9;
+    physicsEngine.addCelestialBody(1, parameters,  	0.07346E24, 1738.1E3);
+
+    parameters.type = OrbitType::ecliptic;
     parameters.eccentricity = 0.2;
     parameters.semimajor_axis = 200E9;
     parameters.argument_of_periapsis = 2;

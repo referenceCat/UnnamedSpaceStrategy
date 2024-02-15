@@ -19,6 +19,7 @@ int PhysicsEngine::addCelestialBody(int parent_id, OrbitalParameters &orbitalPar
     // todo check how soi of both bodies collide
 
     double parent_mass = findCelestialBody(parent_id)->mass;
+    celestialBodies[celestialBodiesN].parent_id = parent_id;
     celestialBodies[celestialBodiesN].mass = mass;
     celestialBodies[celestialBodiesN].radius = radius;
     celestialBodies[celestialBodiesN].soi_radius = orbitalParameters.semimajor_axis * pow(mass / parent_mass, 0.4);
