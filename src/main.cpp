@@ -61,7 +61,6 @@ int main(int argc, char **argv) {
     graphicsEngine->setCameraPosition(0, 0);
     graphicsEngine->setFOV(600E9);
 
-
     // GameEngine loop
     while (running) {
         ALLEGRO_EVENT event;

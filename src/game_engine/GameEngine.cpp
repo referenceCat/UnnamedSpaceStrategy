@@ -91,7 +91,7 @@ void GameEngine::redraw() {
             graphicsEngine.drawOrbitPath(parameters, position, false);
         }
     }
-    if (debug) {
+    if (properties.getBooleanPropertyValue("debug", true)) {
         drawDebugInfo();
     }
     graphicsEngine.endFrame();
@@ -143,4 +143,8 @@ void GameEngine::time_warp_up() {
 void GameEngine::time_warp_down() {
     if (time_warp == 1) time_warp = 0;
     else if (time_warp > 1) time_warp/=10;
+}
+
+Properties *GameEngine::getProperties() {
+    return &properties;
 }
