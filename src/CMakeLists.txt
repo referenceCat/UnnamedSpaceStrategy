@@ -13,6 +13,8 @@ add_executable(test main.cpp
         utils/OrbitParameters.h
         game_engine/ui/GraphicsEngine.h
         game_engine/ui/GraphicsEngine.cpp
+        utils/Properties.cpp
+        utils/Properties.h
 )
 find_package(PkgConfig REQUIRED)
 

@@ -9,6 +9,7 @@
 #include "GraphicsEngine.h"
 #include "GUIEngine.h"
 #include "PhysicsEngine.h"
+#include "../utils/Properties.h"
 #include <cmath>
 enum class Buttons {
     BTN_UP = 1, BTN_DOWN, BTN_LEFT, BTN_RIGHT, BTN_ZOOM_IN, BTN_ZOOM_OUT, BTN_TIME_WARP_UP, BTN_TIME_WARP_DOWN
@@ -20,11 +21,11 @@ private:
     GUIEngine guiEngine;
     GraphicsEngine graphicsEngine;
     PhysicsEngine physicsEngine;
+    Properties properties;
+
     int time_warp = 100;
     int UPS = 50;
 
-
-    bool debug = true;
     void handleEvents();
     void drawDebugInfo();
     void setupKeyBinds();
@@ -34,6 +35,7 @@ public:
     void init();
     InputManager* getInputManager();
     GraphicsEngine* getGraphicsEngine();
+    Properties* getProperties();
     void update();
     void redraw();
     void setUPS(int);
