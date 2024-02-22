@@ -8,7 +8,7 @@
 #include <cmath>
 #include <cassert>
 #include <cfloat>
-#include "src/utils/Vector3d.h"
+#include "../utils/Vector3d.h"
 #define MAX_CELESTIAL_BODIES 100
 #define MIN_CELESTIAL_BODY_MASS 1000000
 #define MIN_CELESTIAL_BODY_RADIUS 100

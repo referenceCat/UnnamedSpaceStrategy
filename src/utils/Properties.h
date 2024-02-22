@@ -4,9 +4,11 @@
 
 #ifndef UNTITLEDSPACESTRATEGY_PROPERTIES_H
 #define UNTITLEDSPACESTRATEGY_PROPERTIES_H
-#include "string"
-#include "hash_map"
-#include "assert.h"
+#include <string>
+#include <hash_map>
+#include <assert.h>
+#include <unordered_map>
+
 
 
 class Properties {
