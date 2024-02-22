@@ -4,11 +4,17 @@
 
 #ifndef UNNAMEDSPACESTRATEGY_GRAPHICSENGINE_H
 #define UNNAMEDSPACESTRATEGY_GRAPHICSENGINE_H
+
+#include <string>
+#include <filesystem>
+
 #include "../utils/Vector3d.h"
 #include "../utils/OrbitParameters.h"
 #include "allegro5/allegro_font.h"
 #include "allegro5/allegro_ttf.h"
 #include "allegro5/allegro_primitives.h"
+
+#include "resources.h"
 
 struct CameraParameters {
     double x, y, FOW_width, FOW_height;
@@ -21,7 +27,9 @@ struct DisplayParameters {
 class GraphicsEngine {
     ALLEGRO_DISPLAY* display;
     double cameraX, cameraY, FOV_width = 600E9, FOV_height = 600E9;
-    ALLEGRO_FONT* debug_font = al_load_ttf_font("/home/referencecat/CLionProjects/UntitledSpaceStrategy/resources/fonts/clacon2.ttf", 16, 0);
+    // TODO: this is ugly, but there is no other way to do it without normal ctor
+    // TODO: use std::filesystem::append instead
+    ALLEGRO_FONT* debug_font = al_load_ttf_font(std::string(resources_path+std::string("/fonts/clacon2.ttf")).c_str(), 16, 0);
     double cameraMovementSpeed = 0.2; // screens per second
 
 public:
