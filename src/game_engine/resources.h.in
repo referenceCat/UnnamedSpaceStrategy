@@ -1,0 +1,9 @@
+//
+// Author: Kirill Trofimov
+// Email: trofkm@gmail.com
+// Date: 22.02.24
+//
+
+#pragma once
+
+static constexpr char resources_path[] = "@RESOURCES_PATH@";
