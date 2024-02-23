@@ -13,7 +13,8 @@
 
 class Properties {
     std::unordered_map<std::string, bool> booleanProperties;
-    bool default_bool = true;
+    std::unordered_map<std::string, int> integerProperties;
+    std::unordered_map<std::string, std::string> stringProperties;
 public:
     bool isBooleanPropertyExists(std::string);
     void setBooleanPropertyValue(std::string, bool);
