@@ -6,8 +6,10 @@
 
 #include <allegro5/keyboard.h>
 #include "stdint.h"
+
 #define MAX_KEY 256
 #define MAX_MOUSE_BUTTON 10
+
 #include "allegro5/events.h"
 #include "queue"
 
@@ -45,23 +47,31 @@ class InputManager {
 
 private:
     int key_table[ALLEGRO_KEY_MAX] = {0};
-    bool pressed_keys [MAX_KEY] = {0};
-    bool pressed_mouse_buttons [MAX_MOUSE_BUTTON] = {0};
+    bool pressed_keys[MAX_KEY] = {0};
+    bool pressed_mouse_buttons[MAX_MOUSE_BUTTON] = {0};
     std::queue<InputEvent> event_queue;
 
 public:
     InputManager();
-    void addEvent(ALLEGRO_EVENT& allegroEvent);
+
+    void addEvent(ALLEGRO_EVENT &allegroEvent);
+
     bool isEmpty() const;
-    InputEvent* getEvent();
+
+    InputEvent *getEvent();
 
     bool isKeyPressed(int) const;
+
     void setKeyCode(int allegro_key_code, int my_key_code);
 
     int getMouseX() const;
+
     int getMouseY() const;
+
     int getMouseZ() const;
-    void setMouse(int x, int y,  int w);
+
+    void setMouse(int x, int y, int w);
+
     bool isMouseButtonPressed(int) const;
 };
 

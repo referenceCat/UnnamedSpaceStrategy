@@ -3,6 +3,7 @@
 //
 
 #include "GraphicsEngine.h"
+
 #define CELESTIAL_MARKER_SIZE 10
 #define HYPERBOLA_MAX_RADIUS_ON_SCREEN 10000
 #define CAMERA_ZOOM_COEF 5
@@ -14,8 +15,8 @@ void GraphicsEngine::setDisplay(ALLEGRO_DISPLAY *display) {
 }
 
 void GraphicsEngine::setCameraPosition(double x, double y) {
-    cameraX = x;
-    cameraY = y;
+    camera_x = x;
+    camera_y = y;
 }
 
 void GraphicsEngine::setFOV(double FOW) {
@@ -24,7 +25,7 @@ void GraphicsEngine::setFOV(double FOW) {
 }
 
 CameraParameters GraphicsEngine::getCameraParameters() {
-    return {cameraX, cameraY, FOV_width, FOV_height};
+    return {camera_x, camera_y, FOV_width, FOV_height};
 }
 
 DisplayParameters GraphicsEngine::getDisplayParameters() {
@@ -32,13 +33,15 @@ DisplayParameters GraphicsEngine::getDisplayParameters() {
 }
 
 void GraphicsEngine::drawCelestialBody(double bodyRadius, Vector3d &position) {
-    int x = (position.x - cameraX + FOV_width / 2) * al_get_display_width(display) / FOV_width;
-    int y = (- position.y + cameraY + FOV_height / 2) * al_get_display_width(display) / FOV_width;
+    int x = (position.x - camera_x + FOV_width / 2) * al_get_display_width(display) / FOV_width;
+    int y = (-position.y + camera_y + FOV_height / 2) * al_get_display_width(display) / FOV_width;
     double radius = (bodyRadius) * al_get_display_width(display) / FOV_width;
 
     if (radius < RADIUS_FOR_MARKER_TO) {
         ALLEGRO_COLOR marker_color = al_map_rgb(0, 255, 0);
-        if (radius > RADIUS_FOR_MARKER_FROM) marker_color = al_map_rgb(0, 255 * (radius - RADIUS_FOR_MARKER_TO) / (RADIUS_FOR_MARKER_FROM - RADIUS_FOR_MARKER_TO), 0);
+        if (radius > RADIUS_FOR_MARKER_FROM) marker_color = al_map_rgb(0, 255 * (radius - RADIUS_FOR_MARKER_TO) /
+                                                                          (RADIUS_FOR_MARKER_FROM -
+                                                                           RADIUS_FOR_MARKER_TO), 0);
 
 
         al_draw_line(x - CELESTIAL_MARKER_SIZE, y + CELESTIAL_MARKER_SIZE, x + CELESTIAL_MARKER_SIZE,
@@ -53,8 +56,8 @@ void GraphicsEngine::drawOrbitPath(OrbitalParameters &orbitalParameters, Vector3
     if (orbitalParameters.type == OrbitType::ecliptic) {
         int on_screen_semimajor_axis = orbitalParameters.semimajor_axis * al_get_display_width(display) / FOV_width;
         int x, y, radius, center_x, center_y, last_x, last_y, x0, y0;
-        center_x = (parent_position.x - cameraX + FOV_width / 2) * al_get_display_width(display) / FOV_width;
-        center_y = (-parent_position.y + cameraY + FOV_height / 2) * al_get_display_width(display) / FOV_width;
+        center_x = (parent_position.x - camera_x + FOV_width / 2) * al_get_display_width(display) / FOV_width;
+        center_y = (-parent_position.y + camera_y + FOV_height / 2) * al_get_display_width(display) / FOV_width;
         radius = on_screen_semimajor_axis * (1 - pow(orbitalParameters.eccentricity, 2)) /
                  (1 + orbitalParameters.eccentricity);
         last_x = center_x + radius * cos(orbitalParameters.argument_of_periapsis);
@@ -98,8 +101,8 @@ void GraphicsEngine::endFrame() {
 }
 
 void GraphicsEngine::drawSOI(double soi_radius, Vector3d &position) {
-    int x = (position.x - cameraX + FOV_width / 2) * al_get_display_width(display) / FOV_width;
-    int y = (- position.y + cameraY + FOV_height / 2) * al_get_display_width(display) / FOV_width;
+    int x = (position.x - camera_x + FOV_width / 2) * al_get_display_width(display) / FOV_width;
+    int y = (-position.y + camera_y + FOV_height / 2) * al_get_display_width(display) / FOV_width;
     int radius = (soi_radius) * al_get_display_width(display) / FOV_width;
 
     al_draw_filled_circle(x, y, radius, al_map_rgba(0, 50, 50, 5));
@@ -109,16 +112,16 @@ void GraphicsEngine::moveCamera(int direction) {
     double value = cameraMovementSpeed * FOV_width;
     switch (direction) {
         case 1:
-            cameraX += value;
+            camera_x += value;
             break;
         case 2:
-            cameraY += value;
+            camera_y += value;
             break;
         case 3:
-            cameraX -= value;
+            camera_x -= value;
             break;
         case 4:
-            cameraY -= value;
+            camera_y -= value;
             break;
         case 5:
             FOV_width -= value * CAMERA_ZOOM_COEF;
@@ -130,10 +133,11 @@ void GraphicsEngine::moveCamera(int direction) {
             break;
     }
 }
-    double GraphicsEngine::getCameraMovementSpeed() const {
-        return cameraMovementSpeed;
-    }
 
-    void GraphicsEngine::setCameraMovementSpeed(double cameraMovementSpeed) {
-        GraphicsEngine::cameraMovementSpeed = cameraMovementSpeed;
-    }
+double GraphicsEngine::getCameraMovementSpeed() const {
+    return cameraMovementSpeed;
+}
+
+void GraphicsEngine::setCameraMovementSpeed(double cameraMovementSpeed) {
+    GraphicsEngine::cameraMovementSpeed = cameraMovementSpeed;
+}
