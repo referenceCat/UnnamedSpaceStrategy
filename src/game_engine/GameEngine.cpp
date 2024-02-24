@@ -26,21 +26,21 @@ void GameEngine::updateCameraPosition() {
 }
 
 void GameEngine::handleEvents() {
-    InputEvent* event = nullptr;
+    InputEvent *event = nullptr;
     while (!inputManager.isEmpty()) {
-         event = inputManager.getEvent();
-         switch (event->type) {
-             case InputEventType::key_down:
-                 std::cout << "key down with id: " << event->keyboardEvent.key_id << std::endl;
-                 switch (event->keyboardEvent.key_id) {
-                     case (int) Buttons::BTN_TIME_WARP_UP:
-                         time_warp_up();
-                         break;
-                     case (int) Buttons::BTN_TIME_WARP_DOWN:
-                         time_warp_down();
-                         break;
-                 }
-                 break;
+        event = inputManager.getEvent();
+        switch (event->type) {
+            case InputEventType::key_down:
+                std::cout << "key down with id: " << event->keyboardEvent.key_id << std::endl;
+                switch (event->keyboardEvent.key_id) {
+                    case (int) Buttons::BTN_TIME_WARP_UP:
+                        time_warp_up();
+                        break;
+                    case (int) Buttons::BTN_TIME_WARP_DOWN:
+                        time_warp_down();
+                        break;
+                }
+                break;
         }
     }
 }
@@ -65,7 +65,7 @@ void GameEngine::init() {
     parameters.type = OrbitType::ecliptic;
     parameters.eccentricity = 0.0549;
     parameters.semimajor_axis = 0.3844E9;
-    physicsEngine.addCelestialBody(1, parameters,  	0.07346E24, 1738.1E3);
+    physicsEngine.addCelestialBody(1, parameters, 0.07346E24, 1738.1E3);
 
     parameters.type = OrbitType::ecliptic;
     parameters.eccentricity = 0.2;
@@ -137,12 +137,12 @@ void GameEngine::setUPS(int ups) {
 
 void GameEngine::time_warp_up() {
     if (time_warp == 0) time_warp = 1;
-    else if (time_warp < 1E7) time_warp*=10;
+    else if (time_warp < 1E7) time_warp *= 10;
 }
 
 void GameEngine::time_warp_down() {
     if (time_warp == 1) time_warp = 0;
-    else if (time_warp > 1) time_warp/=10;
+    else if (time_warp > 1) time_warp /= 10;
 }
 
 Properties *GameEngine::getProperties() {

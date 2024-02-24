@@ -25,25 +25,37 @@ struct DisplayParameters {
 };
 
 class GraphicsEngine {
-    ALLEGRO_DISPLAY* display;
-    double cameraX, cameraY, FOV_width = 600E9, FOV_height = 600E9;
+    ALLEGRO_DISPLAY *display;
+    double camera_x, camera_y, FOV_width = 600E9, FOV_height = 600E9;
     // TODO: this is ugly, but there is no other way to do it without normal ctor
     // TODO: use std::filesystem::append instead
-    ALLEGRO_FONT* debug_font = al_load_ttf_font(std::string(resources_path+std::string("/fonts/clacon2.ttf")).c_str(), 16, 0);
+    ALLEGRO_FONT *debug_font = al_load_ttf_font(std::string(resources_path + std::string("/fonts/clacon2.ttf")).c_str(),
+                                                16, 0);
     double cameraMovementSpeed = 0.2; // screens per second
 
 public:
-    void setDisplay(ALLEGRO_DISPLAY* display);
+    void setDisplay(ALLEGRO_DISPLAY *display);
+
     void setDisplaySize(int width, int height);
+
     void setCameraPosition(double x, double y);
+
     void setFOV(double FOW);
+
     CameraParameters getCameraParameters();
+
     DisplayParameters getDisplayParameters();
-    void drawCelestialBody(double radius, Vector3d& position);
-    void drawOrbitPath(OrbitalParameters& orbitalParameters, Vector3d& parent_position, int debug_lines);
+
+    void drawCelestialBody(double radius, Vector3d &position);
+
+    void drawOrbitPath(OrbitalParameters &orbitalParameters, Vector3d &parent_position, int debug_lines);
+
     void drawDebugText(const char *string, int line);
-    void drawSOI(double radius, Vector3d& position);
+
+    void drawSOI(double radius, Vector3d &position);
+
     void initFrame();
+
     void endFrame();
 
     double getCameraMovementSpeed() const;
