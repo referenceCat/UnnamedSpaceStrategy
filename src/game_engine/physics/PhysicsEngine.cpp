@@ -4,7 +4,7 @@
 #include "PhysicsEngine.h"
 
 CelestialBody * PhysicsEngine::findCelestialBody(int id) {
-    assert((id <= celestialBodiesN) && "there is no body with this id");
+    assert((id <= celestial_body_number) && "there is no body with this id");
     return &celestialBodies[id];
 }
 
@@ -19,14 +19,14 @@ int PhysicsEngine::addCelestialBody(int parent_id, OrbitalParameters &orbitalPar
     // todo check how soi of both bodies collide
 
     double parent_mass = findCelestialBody(parent_id)->mass;
-    celestialBodies[celestialBodiesN].parent_id = parent_id;
-    celestialBodies[celestialBodiesN].mass = mass;
-    celestialBodies[celestialBodiesN].radius = radius;
-    celestialBodies[celestialBodiesN].soi_radius = orbitalParameters.semimajor_axis * pow(mass / parent_mass, 0.4);
-    celestialBodies[celestialBodiesN].orbitParameters = orbitalParameters;
-    celestialBodies[celestialBodiesN].orbitParameters.ecliptic.average_angular_velocity = averageAngularVelocity(celestialBodies[celestialBodiesN].orbitParameters, parent_mass);
-    celestialBodies[celestialBodiesN].orbitParameters.ecliptic.period = period(celestialBodies[celestialBodiesN].orbitParameters);
-    return celestialBodiesN++;
+    celestialBodies[celestial_body_number].parent_id = parent_id;
+    celestialBodies[celestial_body_number].mass = mass;
+    celestialBodies[celestial_body_number].radius = radius;
+    celestialBodies[celestial_body_number].soi_radius = orbitalParameters.semimajor_axis * pow(mass / parent_mass, 0.4);
+    celestialBodies[celestial_body_number].orbitParameters = orbitalParameters;
+    celestialBodies[celestial_body_number].orbitParameters.ecliptic.average_angular_velocity = averageAngularVelocity(celestialBodies[celestial_body_number].orbitParameters, parent_mass);
+    celestialBodies[celestial_body_number].orbitParameters.ecliptic.period = period(celestialBodies[celestial_body_number].orbitParameters);
+    return celestial_body_number++;
 }
 
 double PhysicsEngine::getCelestialBodyMass(int id) {
@@ -47,15 +47,19 @@ int PhysicsEngine::setupStar(double mass, double radius) {
     celestialBodies[0].mass = mass;
     celestialBodies[0].radius = radius;
     celestialBodies[0].soi_radius = DBL_MAX; // todo
-    celestialBodiesN++;
+    celestial_body_number++;
 
     return 0;
 }
 
 void PhysicsEngine::update(uint64_t delta_time) {
     cur_time += delta_time;
-    for (int i = 1; i < celestialBodiesN; i++) {
+    for (int i = 1; i < celestial_body_number; i++) {
         celestialBodies[i].position = getRelativeCelestialBodyPositionAtTime(i, cur_time) + getCelestialBodyPosition(celestialBodies[i].parent_id);
+    }
+
+    for (int i = 0; i < objects_number; i++) {
+        objects[i].position = getRelativeObjectPositionAtTime(i, cur_time) + getCelestialBodyPosition(objects[i].celestial_body_id);
     }
 
 }
@@ -65,9 +69,9 @@ OrbitalParameters PhysicsEngine::getOrbitalParametersOfCelestialBody(int id) {
     return findCelestialBody(id)->orbitParameters;
 }
 
-Vector3d PhysicsEngine::relativePosition(OrbitalParameters &orbitalParameters, uint64_t time) { //todo for non ecliptic orbits
+Vector3d PhysicsEngine::relativePosition(OrbitalParameters &orbitalParameters, uint64_t time, int parent_mass) { //todo for non ecliptic orbits
     double x, y, eccentric_anomaly_value;
-    eccentric_anomaly_value = eccentricAnomaly(orbitalParameters, time);
+    eccentric_anomaly_value = eccentricAnomaly(orbitalParameters, time, parent_mass);
     if (orbitalParameters.type == OrbitType::ecliptic) {
         x = orbitalParameters.semimajor_axis * (cos(eccentric_anomaly_value) - orbitalParameters.eccentricity);
         y = sqrt(1 - orbitalParameters.eccentricity * orbitalParameters.eccentricity) * orbitalParameters.semimajor_axis * sin(eccentric_anomaly_value) * (orbitalParameters.directionCounterClockwise ? 1 : -1);
@@ -83,8 +87,8 @@ Vector3d PhysicsEngine::relativePosition(OrbitalParameters &orbitalParameters, u
     return Vector3d(x, y, 0).rotateAroundZ(orbitalParameters.argument_of_periapsis);
 }
 
-double PhysicsEngine::eccentricAnomaly(OrbitalParameters &orbitalParameters, uint64_t time) const {
-    double M = medianAnomaly(orbitalParameters, time), E = M;
+double PhysicsEngine::eccentricAnomaly(OrbitalParameters &orbitalParameters, uint64_t time, int parent_mass) const {
+    double M = medianAnomaly(orbitalParameters, time, parent_mass), E = M;
     if (orbitalParameters.type == OrbitType::ecliptic) {
         for (int i = 0; i < ECCENTRIC_ANOMALY_ITERATIONS; i++) E = orbitalParameters.eccentricity * sin(E) + M; //TODO ECCENTRIC_ANOMALY_ITERATIONS value?
     } else{
@@ -94,9 +98,9 @@ double PhysicsEngine::eccentricAnomaly(OrbitalParameters &orbitalParameters, uin
     return E;
 }
 
-double PhysicsEngine::medianAnomaly(OrbitalParameters &orbitalParameters, uint64_t time) const {
+double PhysicsEngine::medianAnomaly(OrbitalParameters &orbitalParameters, uint64_t time, int parent_mass) const {
     if (orbitalParameters.type == OrbitType::ecliptic) return fmod((orbitalParameters.med_anomaly_epoch_0 + time * (long double) orbitalParameters.ecliptic.average_angular_velocity / 1000), (M_PI * 2)); //TODO sus to double conv
-    if (orbitalParameters.type == OrbitType::hyperbolic) return orbitalParameters.med_anomaly_epoch_0 + sqrt(- (((orbitalParameters.parent_mass / orbitalParameters.semimajor_axis) * G_const) / orbitalParameters.semimajor_axis) / orbitalParameters.semimajor_axis) * time / 1000;
+    if (orbitalParameters.type == OrbitType::hyperbolic) return orbitalParameters.med_anomaly_epoch_0 + sqrt(- (((parent_mass / orbitalParameters.semimajor_axis) * G_const) / orbitalParameters.semimajor_axis) / orbitalParameters.semimajor_axis) * time / 1000;
 }
 
 double PhysicsEngine::averageAngularVelocity(OrbitalParameters &orbitalParameters, double parent_body_mass) {
@@ -121,7 +125,7 @@ double PhysicsEngine::apoapsis(OrbitalParameters &orbitalParameters) const {
 Vector3d PhysicsEngine::getRelativeCelestialBodyPositionAtTime(int id, uint64_t time) {
     if (id == 0) return {0, 0};
     CelestialBody* body = findCelestialBody(id);
-    return relativePosition(body->orbitParameters, time);
+    return relativePosition(body->orbitParameters, time, findCelestialBody(body->parent_id)->mass);
 }
 
 Vector3d PhysicsEngine::getCelestialBodyPosition(int id) {
@@ -129,10 +133,10 @@ Vector3d PhysicsEngine::getCelestialBodyPosition(int id) {
 }
 
 int PhysicsEngine::getCelestialBodiesNumber() {
-    return celestialBodiesN;
+    return celestial_body_number;
 }
 
-int PhysicsEngine::getParentId(int id) {
+int PhysicsEngine::getCelestialBodyParent(int id) {
     assert(id != 0 && "star doesnt have parent celestial body");
     return findCelestialBody(id)->parent_id;
 }
@@ -141,3 +145,57 @@ uint64_t PhysicsEngine::getTime() {
     return cur_time;
 }
 
+Object *PhysicsEngine::findObject(int id) {
+    assert((id <= objects_number) && "there is no object with this id");
+    return &objects[id];
+}
+
+int PhysicsEngine::addObject(int parent_id, OrbitalParameters &orbitalParameters) {
+    double parent_mass = findCelestialBody(parent_id)->mass;
+    objects[objects_number].celestial_body_id = parent_id;
+    objects[objects_number].orbitParameters = orbitalParameters;
+    if (orbitalParameters.type == OrbitType::ecliptic) {
+        objects[objects_number].orbitParameters.ecliptic.average_angular_velocity = averageAngularVelocity(objects[objects_number].orbitParameters, parent_mass);
+        objects[objects_number].orbitParameters.ecliptic.period = period(objects[objects_number].orbitParameters);
+    } else if (orbitalParameters.type == OrbitType::hyperbolic) {
+        objects[objects_number].orbitParameters.hyperbolic.hyperbolic_excess_speed = hyperbolicExcessSpeed(objects[objects_number].orbitParameters, parent_mass);
+        objects[objects_number].orbitParameters.hyperbolic.impact_parameter = impactParameter(objects[objects_number].orbitParameters);
+    }
+    return objects_number++;
+}
+
+OrbitalParameters PhysicsEngine::getOrbitalParametersOfObject(int id) {
+    return findObject(id)->orbitParameters;
+}
+
+Vector3d PhysicsEngine::getRelativeObjectPositionAtTime(int id, uint64_t time) {
+    return relativePosition(findObject(id)->orbitParameters, time, findCelestialBody(findObject(id)->celestial_body_id)->mass);
+}
+
+Vector3d PhysicsEngine::getObjectPosition(int id) {
+    return findObject(id)->position;
+}
+
+int PhysicsEngine::getObjectsNumber() {
+    return objects_number;
+}
+
+int PhysicsEngine::getObjectParent(int id) {
+    return findObject(id)->celestial_body_id;
+}
+
+void PhysicsEngine::applyAcceleration(int id, Vector3d acceleration) {
+    //todo
+}
+
+double PhysicsEngine::hyperbolicExcessSpeed(OrbitalParameters& orbitalParameters, double parent_body_mass) {
+    assert(orbitalParameters.type==OrbitType::hyperbolic && "cannot get hes for non hyperbolic orbit");
+    double hyperbolic_excess_speed = sqrt(- G_const * parent_body_mass / orbitalParameters.semimajor_axis);
+    return hyperbolic_excess_speed;
+}
+
+double PhysicsEngine::impactParameter(OrbitalParameters& orbitalParameters) {
+    assert(orbitalParameters.type==OrbitType::hyperbolic  && "cannot get impact parameter for non hyperbolic orbit");
+    double impact_parameter = -orbitalParameters.semimajor_axis * (orbitalParameters.eccentricity * orbitalParameters.eccentricity  - 1);
+    return impact_parameter;
+}

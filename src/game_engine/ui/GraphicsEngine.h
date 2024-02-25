@@ -63,6 +63,8 @@ public:
     void setCameraMovementSpeed(double cameraMovementSpeed);
 
     void moveCamera(int direction);
+
+    void drawObject(Vector3d position);
 };
 
 

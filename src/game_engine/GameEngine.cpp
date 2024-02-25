@@ -53,28 +53,7 @@ void GameEngine::init() {
     setupKeyBinds();
     graphicsEngine.setCameraMovementSpeed(0.2 / UPS);
 
-
-    physicsEngine.setupStar(1.9885E30, 7E8);
-    OrbitalParameters parameters;
-    parameters.type = OrbitType::ecliptic;
-    parameters.eccentricity = 0;
-    parameters.semimajor_axis = 149.60E9;
-
-    physicsEngine.addCelestialBody(0, parameters, 5.9736E24, 6378E3);
-
-    parameters.type = OrbitType::ecliptic;
-    parameters.eccentricity = 0.0549;
-    parameters.semimajor_axis = 0.3844E9;
-    physicsEngine.addCelestialBody(1, parameters, 0.07346E24, 1738.1E3);
-
-    parameters.type = OrbitType::ecliptic;
-    parameters.eccentricity = 0.2;
-    parameters.semimajor_axis = 200E9;
-    parameters.argument_of_periapsis = 2;
-    parameters.med_anomaly_epoch_0 = 2;
-    parameters.directionCounterClockwise = false;
-
-    physicsEngine.addCelestialBody(0, parameters, 5.9736E24, 6378E3);
+    initTest();
 }
 
 void GameEngine::redraw() {
@@ -87,10 +66,20 @@ void GameEngine::redraw() {
         if (i != 0) {
             graphicsEngine.drawSOI(physicsEngine.getCelestialBodySOI(i), position);
             parameters = physicsEngine.getOrbitalParametersOfCelestialBody(i);
-            position = physicsEngine.getCelestialBodyPosition(physicsEngine.getParentId(i));
+            position = physicsEngine.getCelestialBodyPosition(physicsEngine.getCelestialBodyParent(i));
             graphicsEngine.drawOrbitPath(parameters, position, false);
         }
     }
+
+    for (int i = 0; i < physicsEngine.getObjectsNumber(); i++) {
+        position = physicsEngine.getObjectPosition(i);
+        graphicsEngine.drawObject(position);
+        parameters = physicsEngine.getOrbitalParametersOfObject(i);
+        position = physicsEngine.getCelestialBodyPosition(physicsEngine.getObjectParent(i));
+        graphicsEngine.drawOrbitPath(parameters, position, false);
+    }
+
+
     if (properties.getBooleanPropertyValue("debug", true)) {
         drawDebugInfo();
     }
@@ -147,4 +136,34 @@ void GameEngine::time_warp_down() {
 
 Properties *GameEngine::getProperties() {
     return &properties;
+}
+
+void GameEngine::initTest() {
+    physicsEngine.setupStar(1.9885E30, 7E8);
+
+    OrbitalParameters parameters;
+    parameters.type = OrbitType::ecliptic;
+    parameters.eccentricity = 0;
+    parameters.semimajor_axis = 149.60E9;
+    physicsEngine.addCelestialBody(0, parameters, 5.9736E24, 6378E3);
+
+    parameters.type = OrbitType::ecliptic;
+    parameters.eccentricity = 0.0549;
+    parameters.semimajor_axis = 0.3844E9;
+    physicsEngine.addCelestialBody(1, parameters, 0.07346E24, 1738.1E3);
+
+    parameters.type = OrbitType::ecliptic;
+    parameters.eccentricity = 0.2;
+    parameters.semimajor_axis = 200E9;
+    parameters.argument_of_periapsis = 2;
+    parameters.med_anomaly_epoch_0 = 2;
+    parameters.directionCounterClockwise = false;
+    physicsEngine.addCelestialBody(0, parameters, 5.9736E24, 6378E3);
+
+    parameters.eccentricity = 0;
+    parameters.directionCounterClockwise = true;
+    parameters.semimajor_axis = physicsEngine.getCelestialBodyRadius(1) + 400000;
+    parameters.med_anomaly_epoch_0 = 0;
+    parameters.argument_of_periapsis = 0;
+    physicsEngine.addObject(1, parameters);
 }

@@ -141,3 +141,16 @@ double GraphicsEngine::getCameraMovementSpeed() const {
 void GraphicsEngine::setCameraMovementSpeed(double cameraMovementSpeed) {
     GraphicsEngine::cameraMovementSpeed = cameraMovementSpeed;
 }
+
+void GraphicsEngine::drawObject(Vector3d position) {
+    int x = (position.x - camera_x + FOV_width / 2) * al_get_display_width(display) / FOV_width;
+    int y = (-position.y + camera_y + FOV_height / 2) * al_get_display_width(display) / FOV_width;
+
+    ALLEGRO_COLOR marker_color = al_map_rgb(0, 255, 255);
+
+
+    al_draw_line(x - CELESTIAL_MARKER_SIZE, y + CELESTIAL_MARKER_SIZE, x + CELESTIAL_MARKER_SIZE,
+                     y - CELESTIAL_MARKER_SIZE, marker_color, 2);
+    al_draw_line(x + CELESTIAL_MARKER_SIZE, y + CELESTIAL_MARKER_SIZE, x - CELESTIAL_MARKER_SIZE,
+                     y - CELESTIAL_MARKER_SIZE, marker_color, 2);
+    }

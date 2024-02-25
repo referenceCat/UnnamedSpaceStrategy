@@ -24,7 +24,7 @@ private:
     PhysicsEngine physicsEngine;
     Properties properties;
 
-    int time_warp = 100;
+    int time_warp = 0;
     int UPS = 50;
 
     void handleEvents();
@@ -36,6 +36,8 @@ private:
 
 public:
     void init();
+
+    void initTest();
 
     InputManager *getInputManager();
 
