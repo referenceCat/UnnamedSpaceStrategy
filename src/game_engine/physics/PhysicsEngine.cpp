@@ -187,6 +187,8 @@ int PhysicsEngine::getObjectParent(int id) {
 void PhysicsEngine::applyAcceleration(int id, Vector3d acceleration) {
     Object* object = findObject(id);
     double parent_mass = findCelestialBody(object->celestial_body_id)->mass;
+    double old_true_anomaly = trueAnomaly(object->orbitParameters, cur_time, parent_mass);
+    double old_argument_of_periapsis = object->orbitParameters.argument_of_periapsis;
     Vector3d velocity = getObjectVelocity(id, cur_time);
     velocity = velocity + acceleration;
     Vector3d h_vec = getRelativeObjectPositionAtTime(id, cur_time) ^ velocity; // specific angular momentum
@@ -197,8 +199,11 @@ void PhysicsEngine::applyAcceleration(int id, Vector3d acceleration) {
     object->orbitParameters.eccentricity = (eccentricity).mag();
     double e_tot = velocity.mag() * velocity.mag() / 2 - G_const * parent_mass / relativeObjectPosition.mag(); // specific orbital energy
     object->orbitParameters.semimajor_axis = G_const * parent_mass / (-2  * e_tot);
+    object->orbitParameters.ecliptic.average_angular_velocity = averageAngularVelocity(object->orbitParameters, parent_mass);
+    object->orbitParameters.ecliptic.period = period(object->orbitParameters);
     object->orbitParameters.argument_of_periapsis = atan2(eccentricity.y, eccentricity.x);
-    ;
+    double new_true_anomaly = old_true_anomaly + old_argument_of_periapsis - object->orbitParameters.argument_of_periapsis;
+    object->orbitParameters.med_anomaly_epoch_0 = meanAnomalyFromTrueAnomaly(new_true_anomaly, object->orbitParameters) - cur_time * (long double) object->orbitParameters.ecliptic.average_angular_velocity / 1000;
 }
 
 double PhysicsEngine::hyperbolicExcessSpeed(OrbitalParameters& orbitalParameters, double parent_body_mass) {
@@ -238,4 +243,16 @@ Vector3d PhysicsEngine::getObjectVelocity(int id, uint64_t time) {
 
 Vector3d PhysicsEngine::getObjectVelocity(int id) {
     return getObjectVelocity(id, cur_time);
+}
+
+double PhysicsEngine::meanAnomalyFromTrueAnomaly(double true_anomaly, OrbitalParameters& orbitalParameters) {
+    return meanAnomalyFromEccentricAnomaly(eccentricAnomalyFromTrueAnomaly(true_anomaly, orbitalParameters), orbitalParameters);
+}
+
+double PhysicsEngine::eccentricAnomalyFromTrueAnomaly(double true_anomaly, OrbitalParameters& orbitalParameters) {
+    return atan2(sqrt(1 - orbitalParameters.eccentricity * orbitalParameters.eccentricity) * sin(true_anomaly), cos(true_anomaly) + orbitalParameters.eccentricity);
+}
+
+double PhysicsEngine::meanAnomalyFromEccentricAnomaly(double eccentric_anomaly, OrbitalParameters& orbitalParameters) {
+    return eccentric_anomaly - orbitalParameters.eccentricity * sin(eccentric_anomaly);
 }

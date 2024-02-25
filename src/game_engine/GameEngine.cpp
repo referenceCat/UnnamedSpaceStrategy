@@ -176,5 +176,5 @@ void GameEngine::initTest() {
     physicsEngine.addObject(1, parameters);
 
     physicsEngine.update(0);
-    physicsEngine.applyAcceleration(0, Vector3d(0, 1000));
+    physicsEngine.applyAcceleration(0, Vector3d(1000, 0));
 }

@@ -55,7 +55,9 @@ class PhysicsEngine {
     static double hyperbolicExcessSpeed(OrbitalParameters &orbitalParameters, double parent_body_mass);
     static double impactParameter(OrbitalParameters &orbitalParameters);
     Object* findObject(int id);
-
+    double meanAnomalyFromTrueAnomaly(double true_anomaly, OrbitalParameters& orbitalParameters);
+    double eccentricAnomalyFromTrueAnomaly(double true_anomaly, OrbitalParameters& orbitalParameters);
+    double meanAnomalyFromEccentricAnomaly(double eccentric_anomaly, OrbitalParameters& orbitalParameters);
 public:
     constexpr const static double G_const = 6.67430E-11;
     void init();
