@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "GameEngine.h"
+#define TEST_ACCELERATION_VALUE 5
 
 InputManager *GameEngine::getInputManager() {
     return &inputManager;
@@ -13,6 +14,7 @@ void GameEngine::update() {
     handleEvents();
     updateCameraPosition();
     physicsEngine.update(((uint64_t) time_warp) * 1000 / UPS);
+    accelerationTest();
 
 }
 
@@ -54,6 +56,7 @@ void GameEngine::init() {
     graphicsEngine.setCameraMovementSpeed(0.2 / UPS);
 
     initTest();
+    physicsEngine.update(0);
 }
 
 void GameEngine::redraw() {
@@ -126,6 +129,10 @@ void GameEngine::setupKeyBinds() {
     inputManager.setKeyCode(ALLEGRO_KEY_MINUS, (int) Buttons::BTN_ZOOM_OUT);
     inputManager.setKeyCode(ALLEGRO_KEY_0, (int) Buttons::BTN_TIME_WARP_UP);
     inputManager.setKeyCode(ALLEGRO_KEY_9, (int) Buttons::BTN_TIME_WARP_DOWN);
+    inputManager.setKeyCode(ALLEGRO_KEY_RIGHT, (int) Buttons::BTN_ENGINE_BURN_RIGHT);
+    inputManager.setKeyCode(ALLEGRO_KEY_UP, (int) Buttons::BTN_ENGINE_BURN_UP);
+    inputManager.setKeyCode(ALLEGRO_KEY_LEFT, (int) Buttons::BTN_ENGINE_BURN_LEFT);
+    inputManager.setKeyCode(ALLEGRO_KEY_DOWN, (int) Buttons::BTN_ENGINE_BURN_DOWN);
 }
 
 void GameEngine::setUPS(int ups) {
@@ -175,6 +182,13 @@ void GameEngine::initTest() {
     parameters.argument_of_periapsis = 0;
     physicsEngine.addObject(1, parameters);
 
-    physicsEngine.update(0);
-    physicsEngine.applyAcceleration(0, Vector3d(1000, 0));
+    // physicsEngine.applyAcceleration(0, Vector3d(1000, 0));
+}
+
+void GameEngine::accelerationTest() {
+    if (time_warp != 1) return;
+    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_RIGHT)) physicsEngine.applyAcceleration(0, Vector3d(TEST_ACCELERATION_VALUE, 0));
+    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_UP)) physicsEngine.applyAcceleration(0, Vector3d(0, TEST_ACCELERATION_VALUE));
+    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_LEFT)) physicsEngine.applyAcceleration(0, Vector3d(-TEST_ACCELERATION_VALUE, 0));
+    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_DOWN)) physicsEngine.applyAcceleration(0, Vector3d(0, -TEST_ACCELERATION_VALUE));
 }

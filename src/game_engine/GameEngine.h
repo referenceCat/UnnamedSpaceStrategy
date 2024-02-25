@@ -13,7 +13,7 @@
 #include <cmath>
 
 enum class Buttons {
-    BTN_UP = 1, BTN_DOWN, BTN_LEFT, BTN_RIGHT, BTN_ZOOM_IN, BTN_ZOOM_OUT, BTN_TIME_WARP_UP, BTN_TIME_WARP_DOWN
+    BTN_UP = 1, BTN_DOWN, BTN_LEFT, BTN_RIGHT, BTN_ZOOM_IN, BTN_ZOOM_OUT, BTN_TIME_WARP_UP, BTN_TIME_WARP_DOWN, BTN_ENGINE_BURN_RIGHT, BTN_ENGINE_BURN_UP, BTN_ENGINE_BURN_LEFT, BTN_ENGINE_BURN_DOWN
 };
 
 class GameEngine {
@@ -56,6 +56,8 @@ public:
     void time_warp_down();
 
     void updateCameraPosition();
+
+    void accelerationTest();
 };
 
 
