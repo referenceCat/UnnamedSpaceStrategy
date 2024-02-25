@@ -27,11 +27,15 @@ struct Vector3d {
 
     Vector3d operator*(double other) const;
 
+    Vector3d operator/(double other) const;
+
     Vector3d operator^(const Vector3d &other) const;
 
     Vector3d operator-() const;
 
     Vector3d rotateAroundZ(double angle) const;
+
+    Vector3d norm() const;
 
 };
 

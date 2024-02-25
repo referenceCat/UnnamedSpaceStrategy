@@ -185,7 +185,18 @@ int PhysicsEngine::getObjectParent(int id) {
 }
 
 void PhysicsEngine::applyAcceleration(int id, Vector3d acceleration) {
-    //todo
+    Object* object = findObject(id);
+    double parent_mass = findCelestialBody(object->celestial_body_id)->mass;
+    Vector3d velocity = getObjectVelocity(id, cur_time);
+    velocity = velocity + acceleration;
+    Vector3d h_vec = getRelativeObjectPositionAtTime(id, cur_time) ^ velocity; // specific angular momentum
+    double h = h_vec.mag(); // specific angular momentum
+
+    Vector3d eccentricity = (velocity ^ h_vec) / (G_const * parent_mass) - object->position.norm();
+    object->orbitParameters.eccentricity = (eccentricity).mag();
+    double e_tot = velocity.mag() / 2 - G_const * parent_mass / object->position.mag(); // specific orbital energy
+    object->orbitParameters.semimajor_axis = - (G_const * parent_mass) / 2 / e_tot;
+    object->orbitParameters.argument_of_periapsis = atan2(eccentricity.y, eccentricity.x) - eccentricity.x < 0 ? M_PI : 0;
 }
 
 double PhysicsEngine::hyperbolicExcessSpeed(OrbitalParameters& orbitalParameters, double parent_body_mass) {
@@ -198,4 +209,25 @@ double PhysicsEngine::impactParameter(OrbitalParameters& orbitalParameters) {
     assert(orbitalParameters.type==OrbitType::hyperbolic  && "cannot get impact parameter for non hyperbolic orbit");
     double impact_parameter = -orbitalParameters.semimajor_axis * (orbitalParameters.eccentricity * orbitalParameters.eccentricity  - 1);
     return impact_parameter;
+}
+
+double PhysicsEngine::trueAnomaly(OrbitalParameters &orbitalParameters, uint64_t time, int parent_mass) const {
+    double beta = orbitalParameters.eccentricity / (1 + sqrt(1 - orbitalParameters.eccentricity * orbitalParameters.eccentricity));
+    double eccentric_anomaly = eccentricAnomaly(orbitalParameters, time, parent_mass);
+    double true_anomaly = eccentric_anomaly + 2 * atan2(beta * sin(eccentric_anomaly), 1 - beta * cos(eccentric_anomaly));
+    return true_anomaly;
+}
+
+
+
+Vector3d PhysicsEngine::getObjectVelocity(int id, uint64_t time) {
+    Object* object = findObject(id);
+    double parent_mass = findCelestialBody(object->celestial_body_id)->mass;
+    double true_anomaly = trueAnomaly(object->orbitParameters, time, parent_mass);
+    Vector3d position = relativePosition(object->orbitParameters, time, parent_mass);
+    double velocity = sqrt(G_const * parent_mass * (2 / position.mag() - 1 / object->orbitParameters.semimajor_axis));
+    double flight_path_angle = 0; // todo
+    Vector3d velocityVec;
+    velocityVec.x = velocity * cos(true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle);
+    velocityVec.y = velocity * sin(true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle); // todo
 }
