@@ -226,8 +226,14 @@ Vector3d PhysicsEngine::getObjectVelocity(int id, uint64_t time) {
     double true_anomaly = trueAnomaly(object->orbitParameters, time, parent_mass);
     Vector3d position = relativePosition(object->orbitParameters, time, parent_mass);
     double velocity = sqrt(G_const * parent_mass * (2 / position.mag() - 1 / object->orbitParameters.semimajor_axis));
-    double flight_path_angle = 0; // todo
+    double periapsis_velocity = sqrt(G_const * parent_mass * (2 / periapsis(object->orbitParameters) - 1 / object->orbitParameters.semimajor_axis));
+    double flight_path_angle = acos(periapsis(object->orbitParameters) * periapsis_velocity/ velocity / position.mag()); // todo
     Vector3d velocityVec;
     velocityVec.x = velocity * cos(true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle);
     velocityVec.y = velocity * sin(true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle); // todo
+    return velocityVec;
+}
+
+Vector3d PhysicsEngine::getObjectVelocity(int id) {
+    return getObjectVelocity(id, cur_time);
 }

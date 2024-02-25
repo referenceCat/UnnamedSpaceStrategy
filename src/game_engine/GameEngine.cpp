@@ -107,6 +107,14 @@ void GameEngine::drawDebugInfo() {
     strcat(line, ":");
     strcat(line, std::to_string((physicsEngine.getTime() / (1000)) % (60)).c_str());
     graphicsEngine.drawDebugText(line, 3);
+
+    strcpy(line, "velocity:  ");
+    strcat(line, std::to_string(physicsEngine.getObjectVelocity(0).mag()).c_str());
+    strcat(line, " x: ");
+    strcat(line, std::to_string(physicsEngine.getObjectVelocity(0).x).c_str());
+    strcat(line, " y: ");
+    strcat(line, std::to_string(physicsEngine.getObjectVelocity(0).y).c_str());
+    graphicsEngine.drawDebugText(line, 4);
 }
 
 void GameEngine::setupKeyBinds() {

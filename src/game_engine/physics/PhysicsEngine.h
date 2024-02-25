@@ -80,6 +80,7 @@ public:
     int getObjectParent(int id);
     void applyAcceleration(int id, Vector3d acceleration);
     Vector3d getObjectVelocity(int id, uint64_t time);
+    Vector3d getObjectVelocity(int id);
 };
 
 
