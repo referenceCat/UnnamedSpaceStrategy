@@ -174,4 +174,7 @@ void GameEngine::initTest() {
     parameters.med_anomaly_epoch_0 = 0;
     parameters.argument_of_periapsis = 0;
     physicsEngine.addObject(1, parameters);
+
+    physicsEngine.update(0);
+    physicsEngine.applyAcceleration(0, Vector3d(0, 1000));
 }

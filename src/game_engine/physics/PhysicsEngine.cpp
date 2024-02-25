@@ -191,12 +191,14 @@ void PhysicsEngine::applyAcceleration(int id, Vector3d acceleration) {
     velocity = velocity + acceleration;
     Vector3d h_vec = getRelativeObjectPositionAtTime(id, cur_time) ^ velocity; // specific angular momentum
     double h = h_vec.mag(); // specific angular momentum
+    Vector3d relativeObjectPosition = getRelativeObjectPositionAtTime(id, cur_time);
 
-    Vector3d eccentricity = (velocity ^ h_vec) / (G_const * parent_mass) - object->position.norm();
+    Vector3d eccentricity = (velocity ^ h_vec) / (G_const * parent_mass) - relativeObjectPosition.norm();
     object->orbitParameters.eccentricity = (eccentricity).mag();
-    double e_tot = velocity.mag() / 2 - G_const * parent_mass / object->position.mag(); // specific orbital energy
-    object->orbitParameters.semimajor_axis = - (G_const * parent_mass) / 2 / e_tot;
-    object->orbitParameters.argument_of_periapsis = atan2(eccentricity.y, eccentricity.x) - eccentricity.x < 0 ? M_PI : 0;
+    double e_tot = velocity.mag() * velocity.mag() / 2 - G_const * parent_mass / relativeObjectPosition.mag(); // specific orbital energy
+    object->orbitParameters.semimajor_axis = G_const * parent_mass / (-2  * e_tot);
+    object->orbitParameters.argument_of_periapsis = atan2(eccentricity.y, eccentricity.x);
+    ;
 }
 
 double PhysicsEngine::hyperbolicExcessSpeed(OrbitalParameters& orbitalParameters, double parent_body_mass) {
@@ -227,10 +229,10 @@ Vector3d PhysicsEngine::getObjectVelocity(int id, uint64_t time) {
     Vector3d position = relativePosition(object->orbitParameters, time, parent_mass);
     double velocity = sqrt(G_const * parent_mass * (2 / position.mag() - 1 / object->orbitParameters.semimajor_axis));
     double periapsis_velocity = sqrt(G_const * parent_mass * (2 / periapsis(object->orbitParameters) - 1 / object->orbitParameters.semimajor_axis));
-    double flight_path_angle = acos(periapsis(object->orbitParameters) * periapsis_velocity/ velocity / position.mag()); // todo
+    double flight_path_angle = acos(periapsis(object->orbitParameters) * periapsis_velocity/ velocity / position.mag());
     Vector3d velocityVec;
     velocityVec.x = velocity * cos(true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle);
-    velocityVec.y = velocity * sin(true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle); // todo
+    velocityVec.y = velocity * sin(true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle);
     return velocityVec;
 }
 
