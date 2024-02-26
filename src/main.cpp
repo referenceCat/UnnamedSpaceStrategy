@@ -38,7 +38,6 @@ int main(int argc, char **argv) {
 
 
     GameEngine gameEngine;
-    gameEngine.init();
     gameEngine.setUPS(UPS);
     InputManager* inputManager = gameEngine.getInputManager();
     GraphicsEngine* graphicsEngine = gameEngine.getGraphicsEngine();
@@ -59,7 +58,8 @@ int main(int argc, char **argv) {
 
 
     graphicsEngine->setCameraPosition(0, 0);
-    graphicsEngine->setFOV(600E9);
+    // graphicsEngine->setFOV(600E9);
+    gameEngine.init();
 
     // GameEngine loop
     while (running) {

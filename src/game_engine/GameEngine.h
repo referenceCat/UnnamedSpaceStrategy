@@ -24,7 +24,7 @@ private:
     PhysicsEngine physicsEngine;
     Properties properties;
 
-    int time_warp = 0;
+    int time_warp = 1;
     int UPS = 50;
 
     void handleEvents();

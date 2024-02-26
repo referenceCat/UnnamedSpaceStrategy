@@ -5,6 +5,7 @@
 #ifndef UNNAMEDSPACESTRATEGY_PHYSICSENGINE_H
 #define UNNAMEDSPACESTRATEGY_PHYSICSENGINE_H
 #include <cstdint>
+#include "iostream"
 #include <cmath>
 #include <cassert>
 #include <cfloat>
@@ -81,6 +82,8 @@ public:
     int getObjectsNumber();
     int getObjectParent(int id);
     void applyAcceleration(int id, Vector3d acceleration);
+    void applyAcceleration(int id, Vector3d acceleration, bool debug);
+    Vector3d getObjectVelocity(int id, uint64_t time, bool debug);
     Vector3d getObjectVelocity(int id, uint64_t time);
     Vector3d getObjectVelocity(int id);
 };

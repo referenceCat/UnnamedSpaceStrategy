@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "GameEngine.h"
-#define TEST_ACCELERATION_VALUE 5
+#define TEST_ACCELERATION_VALUE 100
 
 InputManager *GameEngine::getInputManager() {
     return &inputManager;
@@ -188,16 +188,19 @@ void GameEngine::initTest() {
     physicsEngine.addObject(1, parameters);
 
     properties.setBooleanPropertyValue("track object", true);
+    graphicsEngine.setFOV(5000000);
 
-    // physicsEngine.applyAcceleration(0, Vector3d(1000, 0));
+    // physicsEngine.update(0);
+
+    // physicsEngine.applyAcceleration(0, Vector3d(-200, 0));
 }
 
 void GameEngine::accelerationTest() {
     if (time_warp != 1) return;
-    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_RIGHT)) physicsEngine.applyAcceleration(0, Vector3d(TEST_ACCELERATION_VALUE, 0));
-    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_UP)) physicsEngine.applyAcceleration(0, Vector3d(0, TEST_ACCELERATION_VALUE));
-    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_LEFT)) physicsEngine.applyAcceleration(0, Vector3d(-TEST_ACCELERATION_VALUE, 0));
-    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_DOWN)) physicsEngine.applyAcceleration(0, Vector3d(0, -TEST_ACCELERATION_VALUE));
+    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_RIGHT)) physicsEngine.applyAcceleration(0, Vector3d(TEST_ACCELERATION_VALUE, 0), true);
+    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_UP)) physicsEngine.applyAcceleration(0, Vector3d(0, TEST_ACCELERATION_VALUE), true);
+    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_LEFT)) physicsEngine.applyAcceleration(0, Vector3d(-TEST_ACCELERATION_VALUE, 0), true);
+    if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_DOWN)) physicsEngine.applyAcceleration(0, Vector3d(0, -TEST_ACCELERATION_VALUE), true);
 }
 
 void GameEngine::trackCamera(int id, bool object) {

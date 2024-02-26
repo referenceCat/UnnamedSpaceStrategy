@@ -184,26 +184,35 @@ int PhysicsEngine::getObjectParent(int id) {
     return findObject(id)->celestial_body_id;
 }
 
-void PhysicsEngine::applyAcceleration(int id, Vector3d acceleration) {
+void PhysicsEngine::applyAcceleration(int id, Vector3d acceleration, bool debug) {
     Object* object = findObject(id);
     double parent_mass = findCelestialBody(object->celestial_body_id)->mass;
     double old_true_anomaly = trueAnomaly(object->orbitParameters, cur_time, parent_mass);
     double old_argument_of_periapsis = object->orbitParameters.argument_of_periapsis;
-    Vector3d velocity = getObjectVelocity(id, cur_time);
-    velocity = velocity + acceleration;
-    Vector3d h_vec = getRelativeObjectPositionAtTime(id, cur_time) ^ velocity; // specific angular momentum
+    Vector3d expected_velocity = getObjectVelocity(id);
+    expected_velocity = expected_velocity + acceleration;
+    Vector3d h_vec = getRelativeObjectPositionAtTime(id, cur_time) ^ expected_velocity; // specific angular momentum
     double h = h_vec.mag(); // specific angular momentum
     Vector3d relativeObjectPosition = getRelativeObjectPositionAtTime(id, cur_time);
 
-    Vector3d eccentricity = (velocity ^ h_vec) / (G_const * parent_mass) - relativeObjectPosition.norm();
-    object->orbitParameters.eccentricity = (eccentricity).mag();
-    double e_tot = velocity.mag() * velocity.mag() / 2 - G_const * parent_mass / relativeObjectPosition.mag(); // specific orbital energy
+    Vector3d eccentricityVec = (expected_velocity ^ h_vec) / (G_const * parent_mass) - relativeObjectPosition.norm();
+    object->orbitParameters.eccentricity = (eccentricityVec).mag();
+    double e_tot = expected_velocity.mag() * expected_velocity.mag() / 2 - G_const * parent_mass / relativeObjectPosition.mag(); // specific orbital energy
     object->orbitParameters.semimajor_axis = G_const * parent_mass / (-2  * e_tot);
     object->orbitParameters.ecliptic.average_angular_velocity = averageAngularVelocity(object->orbitParameters, parent_mass);
     object->orbitParameters.ecliptic.period = period(object->orbitParameters);
-    object->orbitParameters.argument_of_periapsis = atan2(eccentricity.y, eccentricity.x);
+    object->orbitParameters.argument_of_periapsis = atanl((long double) eccentricityVec.y / (long double) eccentricityVec.x) + ((eccentricityVec.x < 0 ? M_PI : 0));
     double new_true_anomaly = old_true_anomaly + old_argument_of_periapsis - object->orbitParameters.argument_of_periapsis;
+    if (new_true_anomaly < 0) new_true_anomaly += M_PI * 2;
     object->orbitParameters.med_anomaly_epoch_0 = meanAnomalyFromTrueAnomaly(new_true_anomaly, object->orbitParameters) - cur_time * (long double) object->orbitParameters.ecliptic.average_angular_velocity / 1000;
+    if (debug) {
+        Vector3d result_velocity = getObjectVelocity(id, cur_time, debug);
+        if (abs(expected_velocity.x - result_velocity.x) > 0.3 || abs(expected_velocity.y - result_velocity.y) > 0.2 || result_velocity.x == NAN || result_velocity.y == NAN) {
+            std::cout << expected_velocity.x << ' ' << expected_velocity.y << ' ' << result_velocity.x << ' ' << result_velocity.y << std::endl;
+            Vector3d real_velocity = relativePosition(object->orbitParameters, cur_time + 1000, parent_mass) - relativePosition(object->orbitParameters, cur_time, parent_mass);
+            std::cout << real_velocity.x << ' ' << result_velocity.y << std::endl;
+        }
+    }
 }
 
 double PhysicsEngine::hyperbolicExcessSpeed(OrbitalParameters& orbitalParameters, double parent_body_mass) {
@@ -228,17 +237,7 @@ double PhysicsEngine::trueAnomaly(OrbitalParameters &orbitalParameters, uint64_t
 
 
 Vector3d PhysicsEngine::getObjectVelocity(int id, uint64_t time) {
-    Object* object = findObject(id);
-    double parent_mass = findCelestialBody(object->celestial_body_id)->mass;
-    double true_anomaly = trueAnomaly(object->orbitParameters, time, parent_mass);
-    Vector3d position = relativePosition(object->orbitParameters, time, parent_mass);
-    double velocity = sqrt(G_const * parent_mass * (2 / position.mag() - 1 / object->orbitParameters.semimajor_axis));
-    double periapsis_velocity = sqrt(G_const * parent_mass * (2 / periapsis(object->orbitParameters) - 1 / object->orbitParameters.semimajor_axis));
-    double flight_path_angle = acos(periapsis(object->orbitParameters) * periapsis_velocity/ velocity / position.mag());
-    Vector3d velocityVec;
-    velocityVec.x = velocity * cos(true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle);
-    velocityVec.y = velocity * sin(true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle);
-    return velocityVec;
+    return getObjectVelocity(id, time, false);
 }
 
 Vector3d PhysicsEngine::getObjectVelocity(int id) {
@@ -255,4 +254,22 @@ double PhysicsEngine::eccentricAnomalyFromTrueAnomaly(double true_anomaly, Orbit
 
 double PhysicsEngine::meanAnomalyFromEccentricAnomaly(double eccentric_anomaly, OrbitalParameters& orbitalParameters) {
     return eccentric_anomaly - orbitalParameters.eccentricity * sin(eccentric_anomaly);
+}
+
+void PhysicsEngine::applyAcceleration(int id, Vector3d acceleration) {
+    applyAcceleration(id, acceleration, false);
+}
+
+Vector3d PhysicsEngine::getObjectVelocity(int id, uint64_t time, bool debug) {
+    Object* object = findObject(id);
+    double parent_mass = findCelestialBody(object->celestial_body_id)->mass;
+    double true_anomaly = trueAnomaly(object->orbitParameters, time, parent_mass);
+    Vector3d position = relativePosition(object->orbitParameters, time, parent_mass);
+    double velocity = sqrt(G_const * parent_mass * (2 / position.mag() - 1 / object->orbitParameters.semimajor_axis));
+    double periapsis_velocity = sqrt(G_const * parent_mass * (2 / periapsis(object->orbitParameters) - 1 / object->orbitParameters.semimajor_axis));
+    double flight_path_angle = acos(periapsis(object->orbitParameters) * periapsis_velocity/ velocity / position.mag()) * (true_anomaly > 0 && true_anomaly < M_PI ? 1 : -1);
+    Vector3d velocityVec;
+    velocityVec.x = velocity * cosl((long double) true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle);
+    velocityVec.y = velocity * sinl((long double) true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle);
+    return velocityVec;
 }
