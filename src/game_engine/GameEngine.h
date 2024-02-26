@@ -33,6 +33,16 @@ private:
 
     void setupKeyBinds();
 
+    void time_warp_up();
+
+    void time_warp_down();
+
+    void updateCameraPosition();
+
+    void accelerationTest();
+
+    void trackCamera(int, bool);
+
 
 public:
     void init();
@@ -50,14 +60,6 @@ public:
     void redraw();
 
     void setUPS(int);
-
-    void time_warp_up();
-
-    void time_warp_down();
-
-    void updateCameraPosition();
-
-    void accelerationTest();
 };
 
 

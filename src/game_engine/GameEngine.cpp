@@ -19,10 +19,15 @@ void GameEngine::update() {
 }
 
 void GameEngine::updateCameraPosition() {
-    if (inputManager.isKeyPressed((int) Buttons::BTN_RIGHT)) graphicsEngine.moveCamera(1);
-    if (inputManager.isKeyPressed((int) Buttons::BTN_UP)) graphicsEngine.moveCamera(2);
-    if (inputManager.isKeyPressed((int) Buttons::BTN_LEFT)) graphicsEngine.moveCamera(3);
-    if (inputManager.isKeyPressed((int) Buttons::BTN_DOWN)) graphicsEngine.moveCamera(4);
+    if (properties.getBooleanPropertyValue("track object", false)) {
+        trackCamera(0, true);
+    } else {
+        if (inputManager.isKeyPressed((int) Buttons::BTN_RIGHT)) graphicsEngine.moveCamera(1);
+        if (inputManager.isKeyPressed((int) Buttons::BTN_UP)) graphicsEngine.moveCamera(2);
+        if (inputManager.isKeyPressed((int) Buttons::BTN_LEFT)) graphicsEngine.moveCamera(3);
+        if (inputManager.isKeyPressed((int) Buttons::BTN_DOWN)) graphicsEngine.moveCamera(4);
+    }
+
     if (inputManager.isKeyPressed((int) Buttons::BTN_ZOOM_IN)) graphicsEngine.moveCamera(5);
     if (inputManager.isKeyPressed((int) Buttons::BTN_ZOOM_OUT)) graphicsEngine.moveCamera(6);
 }
@@ -182,6 +187,8 @@ void GameEngine::initTest() {
     parameters.argument_of_periapsis = 0;
     physicsEngine.addObject(1, parameters);
 
+    properties.setBooleanPropertyValue("track object", true);
+
     // physicsEngine.applyAcceleration(0, Vector3d(1000, 0));
 }
 
@@ -191,4 +198,16 @@ void GameEngine::accelerationTest() {
     if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_UP)) physicsEngine.applyAcceleration(0, Vector3d(0, TEST_ACCELERATION_VALUE));
     if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_LEFT)) physicsEngine.applyAcceleration(0, Vector3d(-TEST_ACCELERATION_VALUE, 0));
     if (inputManager.isKeyPressed((int) Buttons::BTN_ENGINE_BURN_DOWN)) physicsEngine.applyAcceleration(0, Vector3d(0, -TEST_ACCELERATION_VALUE));
+}
+
+void GameEngine::trackCamera(int id, bool object) {
+    double x, y;
+    if (object) {
+        x = physicsEngine.getObjectPosition(id).x;
+        y = physicsEngine.getObjectPosition(id).y;
+    } else {
+        x = physicsEngine.getCelestialBodyPosition(id).x;
+        y = physicsEngine.getCelestialBodyPosition(id).y;
+    }
+    graphicsEngine.setCameraPosition(x, y);
 }
