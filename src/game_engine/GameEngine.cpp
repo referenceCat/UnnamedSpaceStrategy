@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "GameEngine.h"
-#define TEST_ACCELERATION_VALUE 100
+#define TEST_ACCELERATION_VALUE 10
 
 InputManager *GameEngine::getInputManager() {
     return &inputManager;
@@ -15,7 +15,7 @@ void GameEngine::update() {
     physicsEngine.update(((uint64_t) time_warp) * 1000 / UPS);
     updateCameraPosition();
     accelerationTest();
-
+    calculate_UPS();
 }
 
 void GameEngine::updateCameraPosition() {
@@ -62,6 +62,8 @@ void GameEngine::init() {
 
     initTest();
     physicsEngine.update(0);
+    FPS_measure = std::chrono::high_resolution_clock::now();
+    UPS_measure = std::chrono::high_resolution_clock::now();
 }
 
 void GameEngine::redraw() {
@@ -92,6 +94,7 @@ void GameEngine::redraw() {
         drawDebugInfo();
     }
     graphicsEngine.endFrame();
+    calculate_FPS();
 }
 
 void GameEngine::drawDebugInfo() {
@@ -100,9 +103,15 @@ void GameEngine::drawDebugInfo() {
     strcat(line, std::to_string(time_warp).c_str());
     graphicsEngine.drawDebugText(line, 1);
 
+    strcpy(line, "UPS: ");
+    strcat(line, Utils::to_string(round(real_UPS), 0).c_str());
+    strcat(line, " FPS: ");
+    strcat(line, Utils::to_string(round(real_FPS), 0).c_str());
+    graphicsEngine.drawDebugText(line, 2);
+
     strcpy(line, "time in msec: ");
     strcat(line, std::to_string(physicsEngine.getTime()).c_str());
-    graphicsEngine.drawDebugText(line, 2);
+    graphicsEngine.drawDebugText(line, 3);
 
     strcpy(line, "year: ");
     strcat(line, std::to_string(physicsEngine.getTime() / ((long int) 365 * 24 * 3600 * 1000)).c_str());
@@ -114,7 +123,7 @@ void GameEngine::drawDebugInfo() {
     strcat(line, std::to_string((physicsEngine.getTime() / (60 * 1000)) % (60)).c_str());
     strcat(line, ":");
     strcat(line, std::to_string((physicsEngine.getTime() / (1000)) % (60)).c_str());
-    graphicsEngine.drawDebugText(line, 3);
+    graphicsEngine.drawDebugText(line, 4);
 
     strcpy(line, "velocity:  ");
     strcat(line, std::to_string(physicsEngine.getObjectVelocity(0).mag()).c_str());
@@ -122,7 +131,7 @@ void GameEngine::drawDebugInfo() {
     strcat(line, std::to_string(physicsEngine.getObjectVelocity(0).x).c_str());
     strcat(line, " y: ");
     strcat(line, std::to_string(physicsEngine.getObjectVelocity(0).y).c_str());
-    graphicsEngine.drawDebugText(line, 4);
+    graphicsEngine.drawDebugText(line, 5);
 }
 
 void GameEngine::setupKeyBinds() {
@@ -188,7 +197,7 @@ void GameEngine::initTest() {
     physicsEngine.addObject(1, parameters);
 
     properties.setBooleanPropertyValue("track object", true);
-    graphicsEngine.setFOV(5000000);
+    graphicsEngine.setFOV(50000000);
 
     // physicsEngine.update(0);
 
@@ -213,4 +222,16 @@ void GameEngine::trackCamera(int id, bool object) {
         y = physicsEngine.getCelestialBodyPosition(id).y;
     }
     graphicsEngine.setCameraPosition(x, y);
+}
+
+void GameEngine::calculate_UPS() {
+    auto now = std::chrono::high_resolution_clock::now();
+    real_UPS = 1E9 / (now - UPS_measure).count();
+    UPS_measure = now;
+}
+
+void GameEngine::calculate_FPS() {
+    auto now = std::chrono::high_resolution_clock::now();
+    real_FPS = 1E9 / (now - FPS_measure).count();
+    FPS_measure = now;
 }

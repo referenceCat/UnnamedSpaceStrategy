@@ -17,6 +17,7 @@ add_executable(test main.cpp
         game_engine/ui/GraphicsEngine.cpp
         utils/Properties.cpp
         utils/Properties.h
+        utils/Utils.h
 )
 
 target_include_directories(test PUBLIC game_engine)
