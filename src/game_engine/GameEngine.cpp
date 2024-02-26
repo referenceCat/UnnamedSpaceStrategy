@@ -12,8 +12,8 @@ InputManager *GameEngine::getInputManager() {
 
 void GameEngine::update() {
     handleEvents();
-    updateCameraPosition();
     physicsEngine.update(((uint64_t) time_warp) * 1000 / UPS);
+    updateCameraPosition();
     accelerationTest();
 
 }
