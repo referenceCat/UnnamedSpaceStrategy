@@ -6,6 +6,8 @@
 #define UNNAMEDSPACESTRATEGY_VECTOR3D_H
 
 #include <cmath>
+#include "Utils.h"
+
 
 
 struct Vector3d {
@@ -36,6 +38,8 @@ struct Vector3d {
     Vector3d rotateAroundZ(double angle) const;
 
     Vector3d norm() const;
+
+    std::string toString(int precision);
 
 };
 

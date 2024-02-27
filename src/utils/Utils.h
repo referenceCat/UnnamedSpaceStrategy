@@ -7,6 +7,9 @@
 
 #include <utility>
 #include "chrono"
+#include "iostream"
+#include "sstream"
+#include "iomanip"
 
 class Utils {
 public:
@@ -18,7 +21,7 @@ public:
         return std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() / 1e6;
     }
 
-    static std::string to_string(double value, int precision) {
+    static std::string toString(double value, int precision) {
         std::stringstream stream;
         stream << std::fixed << std::setprecision(precision) << value;
         std::string s = stream.str();

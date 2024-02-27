@@ -7,7 +7,7 @@
 
 #include <string>
 #include <hash_map>
-#include <assert.h>
+#include <cassert>
 #include <unordered_map>
 
 

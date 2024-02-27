@@ -15,7 +15,7 @@ void GameEngine::update() {
     physicsEngine.update(((uint64_t) time_warp) * 1000 / UPS);
     updateCameraPosition();
     accelerationTest();
-    calculate_UPS();
+    calculateUPS();
 }
 
 void GameEngine::updateCameraPosition() {
@@ -94,7 +94,7 @@ void GameEngine::redraw() {
         drawDebugInfo();
     }
     graphicsEngine.endFrame();
-    calculate_FPS();
+    calculateFPS();
 }
 
 void GameEngine::drawDebugInfo() {
@@ -104,9 +104,9 @@ void GameEngine::drawDebugInfo() {
     graphicsEngine.drawDebugText(line, 1);
 
     strcpy(line, "UPS: ");
-    strcat(line, Utils::to_string(round(real_UPS), 0).c_str());
+    strcat(line, Utils::toString(round(real_UPS), 0).c_str());
     strcat(line, " FPS: ");
-    strcat(line, Utils::to_string(round(real_FPS), 0).c_str());
+    strcat(line, Utils::toString(round(real_FPS), 0).c_str());
     graphicsEngine.drawDebugText(line, 2);
 
     strcpy(line, "time in msec: ");
@@ -125,13 +125,7 @@ void GameEngine::drawDebugInfo() {
     strcat(line, std::to_string((physicsEngine.getTime() / (1000)) % (60)).c_str());
     graphicsEngine.drawDebugText(line, 4);
 
-    strcpy(line, "velocity:  ");
-    strcat(line, std::to_string(physicsEngine.getObjectVelocity(0).mag()).c_str());
-    strcat(line, " x: ");
-    strcat(line, std::to_string(physicsEngine.getObjectVelocity(0).x).c_str());
-    strcat(line, " y: ");
-    strcat(line, std::to_string(physicsEngine.getObjectVelocity(0).y).c_str());
-    graphicsEngine.drawDebugText(line, 5);
+    drawObjectDebugInfo(5, 0);
 }
 
 void GameEngine::setupKeyBinds() {
@@ -225,14 +219,51 @@ void GameEngine::trackCamera(int id, bool object) {
     graphicsEngine.setCameraPosition(x, y);
 }
 
-void GameEngine::calculate_UPS() {
+void GameEngine::calculateUPS() {
     auto now = std::chrono::high_resolution_clock::now();
     real_UPS = 1E9 / (now - UPS_measure).count();
     UPS_measure = now;
 }
 
-void GameEngine::calculate_FPS() {
+void GameEngine::calculateFPS() {
     auto now = std::chrono::high_resolution_clock::now();
     real_FPS = 1E9 / (now - FPS_measure).count();
     FPS_measure = now;
 }
+
+void GameEngine::drawObjectDebugInfo(int lineN, int id) {
+    char line[256] = "---------object info: id=";
+    strcat(line, std::to_string(id).c_str());
+    strcat(line, " ---------");
+    graphicsEngine.drawDebugText(line, lineN);
+
+    strcpy(line, "position:");
+    strcat(line, physicsEngine.getRelativeObjectPositionAtTime(id, physicsEngine.getTime()).toString(0).c_str());
+    graphicsEngine.drawDebugText(line, lineN + 1);
+
+    strcpy(line, "velocity:");
+    strcat(line, physicsEngine.getObjectVelocity(id).toString(0).c_str());
+    graphicsEngine.drawDebugText(line, lineN + 2);
+
+    OrbitalParameters orbitalParameters = physicsEngine.getOrbitalParametersOfObject(id);
+    drawOrbitalParametersDebugInfo(lineN + 3, orbitalParameters);
+}
+
+void GameEngine::drawOrbitalParametersDebugInfo(int lineN, OrbitalParameters &orbitalParameters) {
+    char line[256] = "Direction: ";
+    strcat(line, orbitalParameters.directionCounterClockwise ? "counterclockwise" : "clockwise");
+    graphicsEngine.drawDebugText(line, lineN);
+    strcpy(line, "eccentricity:");
+    strcat(line, Utils::toString(orbitalParameters.eccentricity, 5).c_str());
+    graphicsEngine.drawDebugText(line, lineN + 1);
+    strcpy(line, "semi-major axis: ");
+    strcat(line, Utils::toString(orbitalParameters.semimajor_axis, 0).c_str());
+    graphicsEngine.drawDebugText(line, lineN + 2);
+    strcpy(line, "mean anomaly at time=0: ");
+    strcat(line, Utils::toString(orbitalParameters.med_anomaly_epoch_0, 2).c_str());
+    graphicsEngine.drawDebugText(line, lineN + 3);
+    strcpy(line, "argument of periapsis: ");
+    strcat(line, Utils::toString(orbitalParameters.argument_of_periapsis, 2).c_str());
+    graphicsEngine.drawDebugText(line, lineN + 4);
+}
+

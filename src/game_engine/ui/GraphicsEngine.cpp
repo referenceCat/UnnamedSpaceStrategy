@@ -105,7 +105,7 @@ void GraphicsEngine::drawSOI(double soi_radius, Vector3d &position) {
     int y = (-position.y + camera_y + FOV_height / 2) * al_get_display_width(display) / FOV_width;
     int radius = (soi_radius) * al_get_display_width(display) / FOV_width;
 
-    al_draw_filled_circle(x, y, radius, al_map_rgba(0, 50, 50, 5));
+    al_draw_filled_circle(x, y, radius, al_map_rgba(0, 20, 20, 1));
 }
 
 void GraphicsEngine::moveCamera(int direction) {

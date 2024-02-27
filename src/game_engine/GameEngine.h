@@ -46,9 +46,13 @@ private:
 
     void trackCamera(int, bool);
 
-    void calculate_UPS();
+    void calculateUPS();
 
-    void calculate_FPS();
+    void calculateFPS();
+
+    void drawObjectDebugInfo(int lineN, int id);
+
+    void drawOrbitalParametersDebugInfo(int lineN, OrbitalParameters& orbitalParameters);
 
 
 public:

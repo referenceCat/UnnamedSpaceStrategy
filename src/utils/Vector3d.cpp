@@ -2,6 +2,7 @@
 // Created by referencecat on 09.02.24.
 //
 
+#include <string>
 #include "Vector3d.h"
 
 double Vector3d::mag() const {
@@ -42,5 +43,9 @@ Vector3d Vector3d::operator/(double other) const {
 
 Vector3d Vector3d::norm() const {
     return *this / this->mag();
+}
+
+std::string Vector3d::toString(int precision) {
+    return "(x:" + Utils::toString(x, precision) + ", y:" + Utils::toString(y, precision) + ", z: " + Utils::toString(z, precision) + ")";
 }
 
