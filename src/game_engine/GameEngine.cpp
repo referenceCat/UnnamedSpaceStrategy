@@ -194,6 +194,7 @@ void GameEngine::initTest() {
     parameters.semimajor_axis = physicsEngine.getCelestialBodyRadius(1) + 400000;
     parameters.med_anomaly_epoch_0 = 0;
     parameters.argument_of_periapsis = 0;
+    parameters.directionCounterClockwise = false;
     physicsEngine.addObject(1, parameters);
 
     properties.setBooleanPropertyValue("track object", true);

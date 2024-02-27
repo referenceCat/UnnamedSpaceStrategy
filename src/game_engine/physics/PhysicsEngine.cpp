@@ -203,8 +203,10 @@ void PhysicsEngine::applyAcceleration(int id, Vector3d acceleration, bool debug)
     object->orbitParameters.ecliptic.period = period(object->orbitParameters);
     object->orbitParameters.argument_of_periapsis = atanl((long double) eccentricityVec.y / (long double) eccentricityVec.x) + ((eccentricityVec.x < 0 ? M_PI : 0));
     double new_true_anomaly = old_true_anomaly + old_argument_of_periapsis - object->orbitParameters.argument_of_periapsis;
+    new_true_anomaly *= (object->orbitParameters.directionCounterClockwise ? 1 : -1);
     if (new_true_anomaly < 0) new_true_anomaly += M_PI * 2;
     object->orbitParameters.med_anomaly_epoch_0 = meanAnomalyFromTrueAnomaly(new_true_anomaly, object->orbitParameters) - cur_time * (long double) object->orbitParameters.ecliptic.average_angular_velocity / 1000;
+    if (h_vec.z > 0) object->orbitParameters.directionCounterClockwise = false;
     if (debug) {
         Vector3d result_velocity = getObjectVelocity(id, cur_time, debug);
         if (abs(expected_velocity.x - result_velocity.x) > 0.3 || abs(expected_velocity.y - result_velocity.y) > 0.2 || result_velocity.x == NAN || result_velocity.y == NAN) {
@@ -231,6 +233,7 @@ double PhysicsEngine::trueAnomaly(OrbitalParameters &orbitalParameters, uint64_t
     double beta = orbitalParameters.eccentricity / (1 + sqrt(1 - orbitalParameters.eccentricity * orbitalParameters.eccentricity));
     double eccentric_anomaly = eccentricAnomaly(orbitalParameters, time, parent_mass);
     double true_anomaly = eccentric_anomaly + 2 * atan2(beta * sin(eccentric_anomaly), 1 - beta * cos(eccentric_anomaly));
+    true_anomaly *= (orbitalParameters.directionCounterClockwise ? 1: -1);
     return true_anomaly;
 }
 
@@ -271,5 +274,7 @@ Vector3d PhysicsEngine::getObjectVelocity(int id, uint64_t time, bool debug) {
     Vector3d velocityVec;
     velocityVec.x = velocity * cosl((long double) true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle);
     velocityVec.y = velocity * sinl((long double) true_anomaly + object->orbitParameters.argument_of_periapsis + M_PI / 2 - flight_path_angle);
+    velocityVec.x *= (object->orbitParameters.directionCounterClockwise ? 1 : -1);
+    velocityVec.y *= (object->orbitParameters.directionCounterClockwise ? 1 : -1);
     return velocityVec;
 }
