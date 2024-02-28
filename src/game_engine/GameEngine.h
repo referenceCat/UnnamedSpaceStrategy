@@ -50,9 +50,9 @@ private:
 
     void calculateFPS();
 
-    void drawObjectDebugInfo(int lineN, int id);
+    void drawObjectDebugInfo(int line_n, int id);
 
-    void drawOrbitalParametersDebugInfo(int lineN, OrbitalParameters& orbitalParameters);
+    void drawOrbitalParametersDebugInfo(int line_n, OrbitalParameters& orbitalParameters);
 
 
 public:

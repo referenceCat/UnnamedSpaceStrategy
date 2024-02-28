@@ -21,7 +21,7 @@ struct OrbitalParameters {
     double eccentricity, // e >= 0
     semimajor_axis, // in meters
     argument_of_periapsis = 0, // from OX axis
-    med_anomaly_epoch_0 = 0;
+    mean_anomaly_at_epoch0 = 0;
 
     bool directionCounterClockwise = true;
     union {

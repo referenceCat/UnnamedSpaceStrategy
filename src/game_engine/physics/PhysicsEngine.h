@@ -29,14 +29,14 @@ struct CelestialBody {
 struct Object {
     int id;
     int celestial_body_id;
-    OrbitalParameters orbitParameters;
+    OrbitalParameters orbitalParameters;
     Vector3d position;
 
 };
 
 
 class PhysicsEngine {
-    uint64_t cur_time = 0; // ms since 1970
+    uint64_t current_time_milliseconds = 0; // ms since 1970
 
     CelestialBody celestialBodies [MAX_CELESTIAL_BODIES]; // star always have index 0
     int celestial_body_number = 0;
@@ -46,19 +46,22 @@ class PhysicsEngine {
 
     CelestialBody * findCelestialBody(int id);
     double eccentricAnomaly(OrbitalParameters& orbitalParameters, uint64_t time, int parent_mass) const;
-    double medianAnomaly(OrbitalParameters& orbitalParameters, uint64_t time, int parent_mass) const;
+    double meanAnomaly(OrbitalParameters& orbitalParameters, uint64_t time, int parent_mass) const;
     double trueAnomaly(OrbitalParameters& orbitalParameters, uint64_t time, int parent_mass) const;
     static double averageAngularVelocity(OrbitalParameters& orbitalParameters, double parent_body_mass);
     static double period(OrbitalParameters& orbitalParameters);
     static double periapsis(OrbitalParameters& orbitalParameters) ;
     double apoapsis(OrbitalParameters& orbitalParameters) const;
-    Vector3d relativePosition(OrbitalParameters& orbitalParameters, uint64_t time, int parent_mass);
+    Vector3d relativePosition(OrbitalParameters& orbitalParameters, uint64_t time, double parent_mass);
     static double hyperbolicExcessSpeed(OrbitalParameters &orbitalParameters, double parent_body_mass);
     static double impactParameter(OrbitalParameters &orbitalParameters);
     Object* findObject(int id);
     double meanAnomalyFromTrueAnomaly(double true_anomaly, OrbitalParameters& orbitalParameters);
     double eccentricAnomalyFromTrueAnomaly(double true_anomaly, OrbitalParameters& orbitalParameters);
     double meanAnomalyFromEccentricAnomaly(double eccentric_anomaly, OrbitalParameters& orbitalParameters);
+    OrbitalParameters calculateOrbitalParameters(Vector3d localPosition, Vector3d localVelocity, double parent_mass,
+                                                 uint64_t time);
+    Vector3d positionDifferentialTimes1000(int id, uint64_t time);
 public:
     constexpr const static double G_const = 6.67430E-11;
     void init();

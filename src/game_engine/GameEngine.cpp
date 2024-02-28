@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "GameEngine.h"
-#define TEST_ACCELERATION_VALUE 10
+#define TEST_ACCELERATION_VALUE 20
 
 InputManager *GameEngine::getInputManager() {
     return &inputManager;
@@ -179,16 +179,16 @@ void GameEngine::initTest() {
     parameters.eccentricity = 0.2;
     parameters.semimajor_axis = 200E9;
     parameters.argument_of_periapsis = 2;
-    parameters.med_anomaly_epoch_0 = 2;
+    parameters.mean_anomaly_at_epoch0 = 2;
     parameters.directionCounterClockwise = false;
     physicsEngine.addCelestialBody(0, parameters, 5.9736E24, 6378E3);
 
     parameters.eccentricity = 0;
     parameters.directionCounterClockwise = true;
     parameters.semimajor_axis = physicsEngine.getCelestialBodyRadius(1) + 400000;
-    parameters.med_anomaly_epoch_0 = 0;
+    parameters.mean_anomaly_at_epoch0 = 0;
     parameters.argument_of_periapsis = 0;
-    parameters.directionCounterClockwise = false;
+    parameters.directionCounterClockwise = true;
     physicsEngine.addObject(1, parameters);
 
     properties.setBooleanPropertyValue("track object", true);
@@ -231,39 +231,39 @@ void GameEngine::calculateFPS() {
     FPS_measure = now;
 }
 
-void GameEngine::drawObjectDebugInfo(int lineN, int id) {
+void GameEngine::drawObjectDebugInfo(int line_n, int id) {
     char line[256] = "---------object info: id=";
     strcat(line, std::to_string(id).c_str());
     strcat(line, " ---------");
-    graphicsEngine.drawDebugText(line, lineN);
+    graphicsEngine.drawDebugText(line, line_n);
 
     strcpy(line, "position:");
     strcat(line, physicsEngine.getRelativeObjectPositionAtTime(id, physicsEngine.getTime()).toString(0).c_str());
-    graphicsEngine.drawDebugText(line, lineN + 1);
+    graphicsEngine.drawDebugText(line, line_n + 1);
 
     strcpy(line, "velocity:");
     strcat(line, physicsEngine.getObjectVelocity(id).toString(0).c_str());
-    graphicsEngine.drawDebugText(line, lineN + 2);
+    graphicsEngine.drawDebugText(line, line_n + 2);
 
     OrbitalParameters orbitalParameters = physicsEngine.getOrbitalParametersOfObject(id);
-    drawOrbitalParametersDebugInfo(lineN + 3, orbitalParameters);
+    drawOrbitalParametersDebugInfo(line_n + 3, orbitalParameters);
 }
 
-void GameEngine::drawOrbitalParametersDebugInfo(int lineN, OrbitalParameters &orbitalParameters) {
+void GameEngine::drawOrbitalParametersDebugInfo(int line_n, OrbitalParameters &orbitalParameters) {
     char line[256] = "Direction: ";
     strcat(line, orbitalParameters.directionCounterClockwise ? "counterclockwise" : "clockwise");
-    graphicsEngine.drawDebugText(line, lineN);
+    graphicsEngine.drawDebugText(line, line_n);
     strcpy(line, "eccentricity:");
     strcat(line, Utils::toString(orbitalParameters.eccentricity, 5).c_str());
-    graphicsEngine.drawDebugText(line, lineN + 1);
+    graphicsEngine.drawDebugText(line, line_n + 1);
     strcpy(line, "semi-major axis: ");
     strcat(line, Utils::toString(orbitalParameters.semimajor_axis, 0).c_str());
-    graphicsEngine.drawDebugText(line, lineN + 2);
+    graphicsEngine.drawDebugText(line, line_n + 2);
     strcpy(line, "mean anomaly at time=0: ");
-    strcat(line, Utils::toString(orbitalParameters.med_anomaly_epoch_0, 2).c_str());
-    graphicsEngine.drawDebugText(line, lineN + 3);
+    strcat(line, Utils::toString(orbitalParameters.mean_anomaly_at_epoch0, 2).c_str());
+    graphicsEngine.drawDebugText(line, line_n + 3);
     strcpy(line, "argument of periapsis: ");
     strcat(line, Utils::toString(orbitalParameters.argument_of_periapsis, 2).c_str());
-    graphicsEngine.drawDebugText(line, lineN + 4);
+    graphicsEngine.drawDebugText(line, line_n + 4);
 }
 
