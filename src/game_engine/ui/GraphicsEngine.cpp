@@ -55,28 +55,35 @@ void GraphicsEngine::drawCelestialBody(double bodyRadius, Vector3d &position) {
 void GraphicsEngine::drawOrbitPath(OrbitalParameters &orbitalParameters, Vector3d &parent_position, int debug_lines) {
     if (orbitalParameters.type == OrbitType::ecliptic) {
         int on_screen_semimajor_axis = orbitalParameters.semimajor_axis * al_get_display_width(display) / FOV_width;
-        int x, y, radius, center_x, center_y, last_x, last_y, x0, y0;
+        int center_x, center_y, x, y;
         center_x = (parent_position.x - camera_x + FOV_width / 2) * al_get_display_width(display) / FOV_width;
         center_y = (-parent_position.y + camera_y + FOV_height / 2) * al_get_display_width(display) / FOV_width;
-        radius = on_screen_semimajor_axis * (1 - pow(orbitalParameters.eccentricity, 2)) /
-                 (1 + orbitalParameters.eccentricity);
-        last_x = center_x + radius * cos(orbitalParameters.argument_of_periapsis);
-        last_y = center_y - radius * sin(orbitalParameters.argument_of_periapsis);
-        x0 = last_x;
-        y0 = last_y;
 
-        for (double true_anomaly = 0; true_anomaly < M_PI * 2; true_anomaly += 0.01) {
-            radius = on_screen_semimajor_axis * (1 - pow(orbitalParameters.eccentricity, 2)) /
-                     (1 + orbitalParameters.eccentricity * cos(true_anomaly));
-            x = center_x + radius * cos(true_anomaly + orbitalParameters.argument_of_periapsis);
-            y = center_y - radius * sin(true_anomaly + orbitalParameters.argument_of_periapsis);
-            if (debug_lines) al_draw_line(center_x, center_y, x, y, al_map_rgb(255, 255, 255), 1);
-            al_draw_line(last_x, last_y, x, y, al_map_rgb(255, 255, 255), 1);
-            last_x = x;
-            last_y = y;
+        if (orbitalParameters.eccentricity >= 0.99999)  {
+            x = center_x - on_screen_semimajor_axis * 2 * cos( orbitalParameters.argument_of_periapsis);
+            y = center_y + on_screen_semimajor_axis * 2 * sin( orbitalParameters.argument_of_periapsis);
+            al_draw_line(center_x, center_y, x, y, al_map_rgb(255, 255, 255), 1);
+        } else {
+            int x0, y0, last_x, last_y;
+            double radius = on_screen_semimajor_axis * (1 - pow(orbitalParameters.eccentricity, 2)) / (1 + orbitalParameters.eccentricity);
+            last_x = center_x + radius * cos(orbitalParameters.argument_of_periapsis);
+            last_y = center_y - radius * sin(orbitalParameters.argument_of_periapsis);
+            x0 = last_x;
+            y0 = last_y;
+
+            for (double true_anomaly = 0; true_anomaly < M_PI * 2; true_anomaly += 0.01) {
+                radius = on_screen_semimajor_axis * (1 - pow(orbitalParameters.eccentricity, 2)) /
+                         (1 + orbitalParameters.eccentricity * cos(true_anomaly));
+                x = center_x + radius * cos(true_anomaly + orbitalParameters.argument_of_periapsis);
+                y = center_y - radius * sin(true_anomaly + orbitalParameters.argument_of_periapsis);
+                if (debug_lines) al_draw_line(center_x, center_y, x, y, al_map_rgb(255, 255, 255), 1);
+                al_draw_line(last_x, last_y, x, y, al_map_rgb(255, 255, 255), 1);
+                last_x = x;
+                last_y = y;
+            }
+
+            al_draw_line(last_x, last_y, x0, y0, al_map_rgb(255, 255, 255), 1);
         }
-
-        al_draw_line(last_x, last_y, x0, y0, al_map_rgb(255, 255, 255), 1);
     }
 }
 
