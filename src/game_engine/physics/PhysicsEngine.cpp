@@ -78,7 +78,7 @@ Vector3d PhysicsEngine::relativePosition(OrbitalParameters &orbitalParameters, u
     } else if (orbitalParameters.type == OrbitType::hyperbolic) {
         x = cosh(eccentric_anomaly_value) * orbitalParameters.semimajor_axis - orbitalParameters.semimajor_axis  +
                 periapsis(orbitalParameters);
-        y = orbitalParameters.semimajor_axis * sqrt(orbitalParameters.eccentricity * orbitalParameters.eccentricity - 1) * sinh(eccentric_anomaly_value);
+        y = - orbitalParameters.semimajor_axis * sqrt(orbitalParameters.eccentricity * orbitalParameters.eccentricity - 1) * sinh(eccentric_anomaly_value) * (orbitalParameters.directionCounterClockwise ? 1 : -1);;
 
     } else {
         assert(false); // todo
@@ -212,10 +212,15 @@ double PhysicsEngine::impactParameter(OrbitalParameters& orbitalParameters) {
     return impact_parameter;
 }
 
-double PhysicsEngine::trueAnomaly(OrbitalParameters &orbitalParameters, uint64_t time, int parent_mass) const {
-    double beta = orbitalParameters.eccentricity / (1 + sqrt(1 - orbitalParameters.eccentricity * orbitalParameters.eccentricity));
-    double eccentric_anomaly = eccentricAnomaly(orbitalParameters, time, parent_mass);
-    double true_anomaly = eccentric_anomaly + 2 * atan2(beta * sin(eccentric_anomaly), 1 - beta * cos(eccentric_anomaly));
+double PhysicsEngine::trueAnomaly(OrbitalParameters &orbitalParameters, uint64_t time, double parent_mass) const {
+    double true_anomaly,  eccentric_anomaly = eccentricAnomaly(orbitalParameters, time, parent_mass);
+    if (orbitalParameters.type == OrbitType::ecliptic) {
+        double beta = orbitalParameters.eccentricity /
+                      (1 + sqrt(1 - orbitalParameters.eccentricity * orbitalParameters.eccentricity));
+        true_anomaly = eccentric_anomaly + 2 * atan2(beta * sin(eccentric_anomaly), 1 - beta * cos(eccentric_anomaly));
+    } else {
+        true_anomaly = atan(sqrt((orbitalParameters.eccentricity + 1) / (orbitalParameters.eccentricity - 1)) * tanh(eccentric_anomaly/2)) * 2;
+    }
     true_anomaly *= (orbitalParameters.directionCounterClockwise ? 1: -1);
     return true_anomaly;
 }
