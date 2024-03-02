@@ -183,13 +183,15 @@ void GameEngine::initTest() {
     parameters.directionCounterClockwise = false;
     physicsEngine.addCelestialBody(0, parameters, 5.9736E24, 6378E3);
 
-    parameters.eccentricity = 0;
+
+    parameters.type = OrbitType::hyperbolic;
+    parameters.eccentricity = 1.2;
     parameters.directionCounterClockwise = true;
-    parameters.semimajor_axis = physicsEngine.getCelestialBodyRadius(1) + 400000;
+    parameters.semimajor_axis = -150E9;
     parameters.mean_anomaly_at_epoch0 = 0;
-    parameters.argument_of_periapsis = 0;
+    parameters.argument_of_periapsis = M_PI / 4;
     parameters.directionCounterClockwise = true;
-    physicsEngine.addObject(1, parameters);
+    physicsEngine.addObject(0, parameters);
 
     properties.setBooleanPropertyValue("track object", true);
     graphicsEngine.setFOV(50000000);

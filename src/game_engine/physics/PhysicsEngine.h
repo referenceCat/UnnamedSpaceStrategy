@@ -45,8 +45,8 @@ class PhysicsEngine {
     int objects_number = 0;
 
     CelestialBody * findCelestialBody(int id);
-    double eccentricAnomaly(OrbitalParameters& orbitalParameters, uint64_t time, int parent_mass) const;
-    double meanAnomaly(OrbitalParameters& orbitalParameters, uint64_t time, int parent_mass) const;
+    double eccentricAnomaly(OrbitalParameters& orbitalParameters, uint64_t time, double parent_mass) const;
+    double meanAnomaly(OrbitalParameters& orbitalParameters, uint64_t time, double parent_mass) const;
     double trueAnomaly(OrbitalParameters& orbitalParameters, uint64_t time, int parent_mass) const;
     static double averageAngularVelocity(OrbitalParameters& orbitalParameters, double parent_body_mass);
     static double period(OrbitalParameters& orbitalParameters);

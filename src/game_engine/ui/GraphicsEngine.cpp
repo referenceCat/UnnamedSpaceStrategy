@@ -53,11 +53,11 @@ void GraphicsEngine::drawCelestialBody(double bodyRadius, Vector3d &position) {
 }
 
 void GraphicsEngine::drawOrbitPath(OrbitalParameters &orbitalParameters, Vector3d &parent_position, int debug_lines) {
+    int center_x, center_y, x, y, screen_width = al_get_display_width(display);
+    center_x = (parent_position.x - camera_x + FOV_width / 2) * screen_width / FOV_width;
+    center_y = (-parent_position.y + camera_y + FOV_height / 2) * screen_width / FOV_width;
     if (orbitalParameters.type == OrbitType::ecliptic) {
-        int on_screen_semimajor_axis = orbitalParameters.semimajor_axis * al_get_display_width(display) / FOV_width;
-        int center_x, center_y, x, y;
-        center_x = (parent_position.x - camera_x + FOV_width / 2) * al_get_display_width(display) / FOV_width;
-        center_y = (-parent_position.y + camera_y + FOV_height / 2) * al_get_display_width(display) / FOV_width;
+        int on_screen_semimajor_axis = orbitalParameters.semimajor_axis * screen_width / FOV_width;
 
         if (orbitalParameters.eccentricity >= 0.99999)  {
             x = center_x - on_screen_semimajor_axis * 2 * cos( orbitalParameters.argument_of_periapsis);
@@ -84,6 +84,25 @@ void GraphicsEngine::drawOrbitPath(OrbitalParameters &orbitalParameters, Vector3
 
             al_draw_line(last_x, last_y, x0, y0, al_map_rgb(255, 255, 255), 1);
         }
+    } else if (orbitalParameters.type == OrbitType::hyperbolic) {
+        double radius;
+        int last_x, last_y;
+        double asymptote_angle = 2 * atan(sqrt(orbitalParameters.eccentricity * orbitalParameters.eccentricity - 1));
+        int on_screen_parameter = (orbitalParameters.semimajor_axis * (orbitalParameters.eccentricity * orbitalParameters.eccentricity - 1)) * screen_width / FOV_width;
+        last_x = center_x - HYPERBOLA_MAX_RADIUS_ON_SCREEN * cos(orbitalParameters.argument_of_periapsis + asymptote_angle / 2);
+        last_y = center_y + HYPERBOLA_MAX_RADIUS_ON_SCREEN * sin(orbitalParameters.argument_of_periapsis + asymptote_angle / 2);
+        for (double true_anomaly =  - M_PI + asymptote_angle / 2 + 0.01; true_anomaly < M_PI - asymptote_angle / 2 - 0.01; true_anomaly += 0.01) {
+            radius = on_screen_parameter / (1 + orbitalParameters.eccentricity * cos(true_anomaly));
+            x = center_x - radius * cos(true_anomaly + orbitalParameters.argument_of_periapsis);
+            y = center_y + radius * sin(true_anomaly + orbitalParameters.argument_of_periapsis);
+            if (debug_lines) al_draw_line(center_x, center_y, x, y, al_map_rgb(255, 255, 255), 1);
+            al_draw_line(last_x, last_y, x, y, al_map_rgb(255, 255, 255), 1);
+            last_x = x;
+            last_y = y;
+        }
+        x =  last_x - HYPERBOLA_MAX_RADIUS_ON_SCREEN * cos(orbitalParameters.argument_of_periapsis - asymptote_angle / 2);
+        y =  last_y + HYPERBOLA_MAX_RADIUS_ON_SCREEN * sin(orbitalParameters.argument_of_periapsis - asymptote_angle / 2);
+        al_draw_line(last_x, last_y, x, y, al_map_rgb(255, 255, 255), 1);
     }
 }
 

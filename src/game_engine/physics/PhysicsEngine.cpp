@@ -87,7 +87,7 @@ Vector3d PhysicsEngine::relativePosition(OrbitalParameters &orbitalParameters, u
     return Vector3d(x, y, 0).rotateAroundZ(orbitalParameters.argument_of_periapsis);
 }
 
-double PhysicsEngine::eccentricAnomaly(OrbitalParameters &orbitalParameters, uint64_t time, int parent_mass) const {
+double PhysicsEngine::eccentricAnomaly(OrbitalParameters &orbitalParameters, uint64_t time, double parent_mass) const {
     double M = meanAnomaly(orbitalParameters, time, parent_mass), E = M;
     if (orbitalParameters.type == OrbitType::ecliptic) {
         for (int i = 0; i < ECCENTRIC_ANOMALY_ITERATIONS; i++) E = orbitalParameters.eccentricity * sin(E) + M; //TODO ECCENTRIC_ANOMALY_ITERATIONS value?
@@ -98,7 +98,7 @@ double PhysicsEngine::eccentricAnomaly(OrbitalParameters &orbitalParameters, uin
     return E;
 }
 
-double PhysicsEngine::meanAnomaly(OrbitalParameters &orbitalParameters, uint64_t time, int parent_mass) const {
+double PhysicsEngine::meanAnomaly(OrbitalParameters &orbitalParameters, uint64_t time, double parent_mass) const {
     if (orbitalParameters.type == OrbitType::ecliptic) return fmod((orbitalParameters.mean_anomaly_at_epoch0 + time * (long double) orbitalParameters.ecliptic.average_angular_velocity / 1000), (M_PI * 2)); //TODO sus to double conv
     if (orbitalParameters.type == OrbitType::hyperbolic) return orbitalParameters.mean_anomaly_at_epoch0 + sqrt(- (((parent_mass / orbitalParameters.semimajor_axis) * G_const) / orbitalParameters.semimajor_axis) / orbitalParameters.semimajor_axis) * time / 1000;
 }
